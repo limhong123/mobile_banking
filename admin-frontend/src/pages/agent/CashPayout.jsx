@@ -8,13 +8,10 @@ import {
   Search,
 } from "lucide-react";
 
-import Sidebar
-  from "../components/Sidebar";
-
 import {
   checkCashPickup,
   claimCashPickup,
-} from "../api/cashTransferApi";
+} from "../../api/cashTransferApi";
 
 
 export default function AgentCashPayout() {
@@ -152,11 +149,7 @@ export default function AgentCashPayout() {
 
 
   return (
-    <div className="min-h-screen bg-slate-50">
-
-      <Sidebar />
-
-      <main className="ml-[255px] min-h-screen p-8">
+    <>
 
         <h1 className="text-3xl font-bold text-slate-900">
           Cash Payout
@@ -295,9 +288,7 @@ export default function AgentCashPayout() {
 
         </div>
 
-      </main>
-
-    </div>
+      </>
   );
 }
 

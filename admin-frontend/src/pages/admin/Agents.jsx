@@ -11,9 +11,10 @@ import {
   UserRoundCog,
   Wallet,
   X,
+  SlidersHorizontal,
 } from "lucide-react";
 
-import Sidebar from "../components/Sidebar";
+import BalanceAdjustmentModal from "../../components/BalanceAdjustmentModal";
 
 import {
   createAgent,
@@ -21,7 +22,7 @@ import {
   resetAgentPin,
   toggleAgentStatus,
   topUpAgent,
-} from "../api/adminApi";
+} from "../../api/adminApi";
 
 
 // =====================================================
@@ -39,7 +40,7 @@ const emptyAgentForm = {
   agent_code: "",
   branch_name: "",
   daily_transaction_limit:
-    "5000",
+    "",
   pin: "",
   confirm_pin: "",
 };
@@ -74,6 +75,11 @@ export default function Agents() {
   const [
     selectedAgent,
     setSelectedAgent,
+  ] = useState(null);
+
+  const [
+    adjustAgent,
+    setAdjustAgent,
   ] = useState(null);
 
   const [
@@ -276,23 +282,23 @@ export default function Agents() {
     }
 
 
-    const dailyLimit =
-      Number(
-        form.daily_transaction_limit
-      );
-
-
+    let dailyLimit = null;
     if (
-      !Number.isFinite(
-        dailyLimit
-      ) ||
-      dailyLimit <= 0
+      form.daily_transaction_limit &&
+      String(form.daily_transaction_limit).trim() !== ""
     ) {
-      alert(
-        "Daily transaction limit must be greater than 0"
-      );
+      dailyLimit = Number(form.daily_transaction_limit);
 
-      return;
+      if (
+        !Number.isFinite(dailyLimit) ||
+        dailyLimit <= 0
+      ) {
+        alert(
+          "Daily transaction limit must be greater than 0 if provided"
+        );
+
+        return;
+      }
     }
 
 
@@ -717,12 +723,7 @@ export default function Agents() {
   // =====================================================
 
   return (
-    <div className="min-h-screen bg-slate-50">
-
-      <Sidebar />
-
-
-      <main className="ml-[255px] min-h-screen p-8">
+    <>
 
         {/* HEADER */}
 
@@ -1066,6 +1067,31 @@ export default function Agents() {
                               Top Up
                             </button>
 
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setAdjustAgent({
+                                  id: agent.id,
+                                  name: `${agent.first_name || ""} ${agent.last_name || ""}`.trim() || agent.agent_code || "Agent",
+                                  phone: agent.phone_number,
+                                  balance: agent.balance,
+                                  currency: agent.currency || "USD",
+                                  type: "agent",
+                                })
+                              }
+                              disabled={
+                                !agent.is_active
+                              }
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
+                              title="Manual Balance Debit or Credit"
+                            >
+                              <SlidersHorizontal
+                                size={15}
+                              />
+
+                              Debit / Credit
+                            </button>
+
 
                             <button
                               type="button"
@@ -1376,8 +1402,8 @@ export default function Agents() {
 
                     <label className="mb-2 block text-sm font-semibold text-slate-700">
                       Daily Transaction Limit
-                      <span className="ml-1 text-red-500">
-                        *
+                      <span className="ml-1 text-xs font-normal text-slate-400">
+                        (Optional - leave empty for no limit)
                       </span>
                     </label>
 
@@ -1400,7 +1426,7 @@ export default function Agents() {
                         onChange={
                           handleChange
                         }
-                        required
+                        placeholder="Unlimited (No limit)"
                         className="w-full bg-transparent px-3 py-3 text-sm outline-none"
                       />
 
@@ -1413,8 +1439,7 @@ export default function Agents() {
 
 
                     <p className="mt-2 text-xs text-slate-400">
-                      Maximum total amount this
-                      agent can process per day.
+                      Optional limit. Leave empty or unset for unlimited deposits.
                     </p>
 
                   </div>
@@ -1765,9 +1790,14 @@ export default function Agents() {
 
           )}
 
-      </main>
+        <BalanceAdjustmentModal
+          isOpen={Boolean(adjustAgent)}
+          onClose={() => setAdjustAgent(null)}
+          target={adjustAgent}
+          onSuccess={loadAgents}
+        />
 
-    </div>
+      </>
   );
 }
 

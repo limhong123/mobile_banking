@@ -14,17 +14,22 @@ void main() async {
   // Local storage
   await GetStorage.init();
 
-  // Firebase
-  await Firebase.initializeApp();
-
-  // Notification
-  await NotificationService.instance.initialize();
-
   // PIN Controller
   Get.put<PinController>(
     PinController(),
     permanent: true,
   );
+
+  // Initialize Firebase safely
+  try {
+    await Firebase.initializeApp();
+    // Initialize Notification service in the background (non-blocking)
+    NotificationService.instance.initialize().catchError((dynamic e) {
+      debugPrint('NotificationService init error: $e');
+    });
+  } catch (e) {
+    debugPrint('Firebase.initializeApp error: $e');
+  }
 
   runApp(const MainApp());
 }

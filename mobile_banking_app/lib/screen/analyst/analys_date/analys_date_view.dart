@@ -1,6 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_banking_app/app/app_color.dart';
+import 'package:mobile_banking_app/app/app_text.dart';
 
 import 'analys_date_controller.dart';
 
@@ -17,9 +19,9 @@ class AnalysDateView extends GetView<AnalysDateController> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title:  Text(
           'ចំណូល និង ចំណាយ',
-          style: TextStyle(
+          style: AppText.h4.copyWith(
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
@@ -172,14 +174,14 @@ class AnalysDateView extends GetView<AnalysDateController> {
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? Colors.amber
+                ? AppColor.primaryColor
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
             child: Text(
               label,
-              style: TextStyle(
+              style: AppText.h4.copyWith(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: isSelected
@@ -207,9 +209,9 @@ class AnalysDateView extends GetView<AnalysDateController> {
             mainAxisAlignment:
                 MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+               Text(
                 'សង្ខេបប្រតិបត្តិការ',
-                style: TextStyle(
+                style: AppText.bodyLarge.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -217,7 +219,7 @@ class AnalysDateView extends GetView<AnalysDateController> {
 
               Text(
                 _currentFilterName(),
-                style: TextStyle(
+                style: AppText.bodyMedium.copyWith(
                   color: Colors.grey.shade500,
                   fontWeight: FontWeight.w500,
                 ),
@@ -261,7 +263,7 @@ class AnalysDateView extends GetView<AnalysDateController> {
                   children: [
                     Text(
                       'សរុប',
-                      style: TextStyle(
+                      style: AppText.h4.copyWith(
                         fontSize: 13,
                         color: Colors.grey.shade500,
                       ),
@@ -271,7 +273,7 @@ class AnalysDateView extends GetView<AnalysDateController> {
 
                     Text(
                       '\$${controller.total.toStringAsFixed(2)}',
-                      style: const TextStyle(
+                      style:  AppText.h4.copyWith(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -325,7 +327,7 @@ class AnalysDateView extends GetView<AnalysDateController> {
 
         Text(
           text,
-          style: const TextStyle(
+          style:  AppText.bodyLarge.copyWith(
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -400,7 +402,7 @@ class AnalysDateView extends GetView<AnalysDateController> {
 
           Text(
             title,
-            style: TextStyle(
+            style: AppText.bodyLarge.copyWith(
               color: Colors.grey.shade600,
             ),
           ),
@@ -409,7 +411,7 @@ class AnalysDateView extends GetView<AnalysDateController> {
 
           Text(
             '\$${amount.toStringAsFixed(2)}',
-            style: const TextStyle(
+            style:  AppText.h4.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -419,7 +421,7 @@ class AnalysDateView extends GetView<AnalysDateController> {
 
           Text(
             '${percent.toStringAsFixed(1)}%',
-            style: TextStyle(
+            style: AppText.h4.copyWith(
               color: iconColor,
               fontSize: 13,
               fontWeight: FontWeight.w600,

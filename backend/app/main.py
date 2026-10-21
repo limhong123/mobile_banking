@@ -15,7 +15,8 @@ from app.routers import (
     transfers,
     notifications,
     transactions,
-    cash_transfers
+    cash_transfers,
+    profile
 )
 from app.services.firebase_notification_service import (
     initialize_firebase,
@@ -107,7 +108,9 @@ app.include_router(
 app.include_router(
     cash_transfers.router
 )
-
+app.include_router(
+    profile.router
+)
 # ==========================================
 # STATIC FILES
 # ==========================================

@@ -115,147 +115,162 @@ class MyQrView extends GetView<MyQrController> {
                 // ===========================================
                 // QR CARD
                 // ===========================================
-                Container(
-                  width: double.infinity,
+                RepaintBoundary(
+                  key: controller.qrCardKey,
+                  child: Container(
+                    width: double.infinity,
 
-                  constraints: const BoxConstraints(maxWidth: 300),
+                    constraints: const BoxConstraints(maxWidth: 300),
 
-                  padding: const EdgeInsets.only(bottom: 24),
+                    padding: const EdgeInsets.only(bottom: 24),
 
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
 
-                    borderRadius: BorderRadius.circular(28),
+                      borderRadius: BorderRadius.circular(28),
 
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
 
-                        blurRadius: 24,
+                          blurRadius: 24,
 
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-
-                    children: [
-                      // =====================================
-                      // HEADER
-                      // =====================================
-                      Container(
-                        width: double.infinity,
-
-                        height: 58,
-
-                        decoration: BoxDecoration(
-                          color: AppColor.secondaryColor,
-
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(28),
-
-                            topRight: Radius.circular(28),
-                          ),
+                          offset: const Offset(0, 8),
                         ),
+                      ],
+                    ),
 
-                        child: Center(
-                          child: Text(
-                            'KHEMPAY QR',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
 
-                            style: AppText.h4.copyWith(
-                              color: Colors.white,
+                      children: [
+                        // =====================================
+                        // HEADER
+                        // =====================================
+                        Container(
+                          width: double.infinity,
 
-                              fontWeight: FontWeight.w700,
+                          height: 58,
+
+                          decoration: BoxDecoration(
+                            color: AppColor.secondaryColor,
+
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(28),
+
+                              topRight: Radius.circular(28),
                             ),
                           ),
-                        ),
-                      ),
 
-                      // =====================================
-                      // NAME + AMOUNT
-                      // =====================================
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-
-                          vertical: 10,
-                        ),
-
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-
-                          children: [
-                            Text(
-                              controller.customerName.value,
+                          child: Center(
+                            child: Text(
+                              'KHEMPAY QR',
 
                               style: AppText.h4.copyWith(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 20,
+                                color: Colors.white,
+
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
+                          ),
+                        ),
 
-                            const SizedBox(height: 4),
+                        // =====================================
+                        // NAME + AMOUNT
+                        // =====================================
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
 
-                            // =================================
-                            // SHOW AMOUNT
-                            // =================================
-                            if (controller.selectedAmount.value > 0)
-                              Row(
-                                children: [
-                                  Text(
-                                    '\$${controller.selectedAmount.value.toStringAsFixed(2)}',
+                            vertical: 10,
+                          ),
 
-                                    style: AppText.h3.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
 
-                                  const Spacer(),
-
-                                  GestureDetector(
-                                    onTap: controller.clearAmount,
-
-                                    child: const Icon(
-                                      Icons.close,
-                                      size: 20,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            else
+                            children: [
                               Text(
-                                '0',
+                                controller.customerName.value,
 
-                                style: AppText.h3.copyWith(
-                                  fontSize: 22,
+                                maxLines: 1,
 
-                                  fontWeight: FontWeight.w500,
+                                overflow: TextOverflow.ellipsis,
+
+                                style: AppText.h4.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 20,
                                 ),
                               ),
-                          ],
+
+                              const SizedBox(height: 4),
+
+                              // =================================
+                              // SHOW AMOUNT
+                              // =================================
+                              if (controller.selectedAmount.value > 0)
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        '\$${controller.selectedAmount.value.toStringAsFixed(2)}',
+
+                                        maxLines: 1,
+
+                                        overflow: TextOverflow.ellipsis,
+
+                                        style: AppText.h3.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+
+                                    if (!controller.isCapturing.value) ...[
+                                      const SizedBox(width: 8),
+
+                                      GestureDetector(
+                                        onTap: controller.clearAmount,
+
+                                        child: const Icon(
+                                          Icons.close,
+                                          size: 20,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                )
+                              else
+                                Text(
+                                  '0',
+
+                                  style: AppText.h3.copyWith(
+                                    fontSize: 22,
+
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
 
-                      // =====================================
-                      // QR
-                      // =====================================
-                      Center(
-                        child: QrImageView(
-                          data: controller.qrPayload.value,
+                        // =====================================
+                        // QR
+                        // =====================================
+                        Center(
+                          child: QrImageView(
+                            data: controller.qrPayload.value,
 
-                          version: QrVersions.auto,
+                            version: QrVersions.auto,
 
-                          size: 250,
+                            size: 250,
 
-                          backgroundColor: Colors.white,
+                            backgroundColor: Colors.white,
 
-                          errorCorrectionLevel: QrErrorCorrectLevel.M,
+                            errorCorrectionLevel: QrErrorCorrectLevel.M,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
 
@@ -336,38 +351,57 @@ class MyQrView extends GetView<MyQrController> {
       // ===================================================
       // BOTTOM ACTION
       // ===================================================
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          height: 85,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
 
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
 
-          decoration: BoxDecoration(
-            color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
 
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              blurRadius: 15,
 
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
 
-                blurRadius: 15,
+        child: SafeArea(
+          top: false,
 
-                offset: const Offset(0, -2),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+
+            child: Obx(
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                children: [
+                  ItemButton(
+                    text: 'Save',
+                    icon: Icons.save_alt,
+                    isLoading: controller.isSaving.value,
+                    onTap: controller.saveQrImage,
+                  ),
+
+                  ItemButton(
+                    text: 'Share',
+                    icon: Icons.share,
+                    isLoading: controller.isSharing.value,
+                    onTap: controller.shareQrImage,
+                  ),
+
+                  ItemButton(
+                    text: 'Telegram',
+                    icon: Icons.telegram_outlined,
+                    isLoading: controller.isTelegramSharing.value,
+                    onTap: controller.shareToTelegram,
+                  ),
+                ],
               ),
-            ],
-          ),
-
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-            children: [
-              ItemButton(text: 'រក្សាទុក', icon: Icons.save_alt),
-
-              ItemButton(text: 'ចែករំលែក', icon: Icons.share),
-
-              ItemButton(text: 'តេឡេក្រាម', icon: Icons.telegram_outlined),
-            ],
+            ),
           ),
         ),
       ),

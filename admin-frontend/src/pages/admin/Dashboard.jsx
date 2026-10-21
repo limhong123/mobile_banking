@@ -10,13 +10,10 @@ import {
   Wallet,
 } from "lucide-react";
 
-import Sidebar
-  from "../components/Sidebar";
-
 import {
   getAgents,
   getUsers,
-} from "../api/adminApi";
+} from "../../api/adminApi";
 
 
 export default function Dashboard() {
@@ -159,12 +156,7 @@ export default function Dashboard() {
 
 
   return (
-    <div className="min-h-screen bg-slate-50">
-
-      <Sidebar />
-
-
-      <main className="ml-[255px] min-h-screen p-8">
+    <>
 
         {/* HEADER */}
 
@@ -433,9 +425,7 @@ export default function Dashboard() {
           </>
         )}
 
-      </main>
-
-    </div>
+      </>
   );
 }
 

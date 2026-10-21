@@ -856,6 +856,19 @@ async def get_me(
                     "kyc_status",
                     "not_submitted",
                 ),
+
+            "profile_photo":
+                current_user.get(
+                    "profile_photo",
+                    "",
+                ),
+
+            "nid_data":
+                (
+                    (current_user.get("kyc") or {}).get("nid_data")
+                    or current_user.get("nid_data")
+                    or {}
+                ),
         },
     }
 

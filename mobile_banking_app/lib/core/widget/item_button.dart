@@ -1,34 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_banking_app/app/app_text.dart';
 
-class ItemButton extends StatefulWidget {
+class ItemButton extends StatelessWidget {
   final String text;
   final IconData icon;
-  const ItemButton({super.key, required this.text, required this.icon});
+  final VoidCallback? onTap;
+  final bool isLoading;
+  final Color? color;
 
-  @override
-  State<ItemButton> createState() => _ItemButtonState();
-}
+  const ItemButton({
+    super.key,
+    required this.text,
+    required this.icon,
+    this.onTap,
+    this.isLoading = false,
+    this.color,
+  });
 
-class _ItemButtonState extends State<ItemButton> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.green.shade600,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(widget.icon, color: Colors.white),
+    final themeColor = color ?? Colors.green.shade600;
+
+    return InkWell(
+      onTap: isLoading ? null : onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: themeColor,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: isLoading
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Icon(icon, color: Colors.white, size: 20),
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              text,
+              style: AppText.bodySmall.copyWith(
+                color: themeColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
-        Text(
-          widget.text,
-          style: AppText.bodySmall.copyWith(color: Colors.green.shade600),
-        ),
-      ],
+      ),
     );
   }
 }

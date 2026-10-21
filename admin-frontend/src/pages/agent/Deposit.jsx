@@ -10,13 +10,10 @@ import {
   UserRound,
 } from "lucide-react";
 
-import Sidebar
-  from "../components/Sidebar";
-
 import {
   depositCustomer,
   searchCustomer,
-} from "../api/agentApi";
+} from "../../api/agentApi";
 
 
 export default function AgentDeposit() {
@@ -294,12 +291,7 @@ export default function AgentDeposit() {
   // =====================================================
 
   return (
-    <div className="min-h-screen bg-slate-50">
-
-      <Sidebar />
-
-
-      <main className="ml-[255px] min-h-screen p-8">
+    <>
 
         {/* HEADER */}
 
@@ -843,9 +835,7 @@ export default function AgentDeposit() {
 
         </div>
 
-      </main>
-
-    </div>
+      </>
   );
 }
 

@@ -5,288 +5,111 @@ import {
   Routes,
 } from "react-router-dom";
 
-import AdminLogin
-  from "./pages/AdminLogin";
+// Auth
+import Login from "./pages/auth/Login";
 
-import Dashboard
-  from "./pages/Dashboard";
+// Admin Pages
+import Dashboard from "./pages/admin/Dashboard";
+import Users from "./pages/admin/Users";
+import UserKycDetail from "./pages/admin/UserKycDetail";
+import Agents from "./pages/admin/Agents";
+import SystemWallet from "./pages/admin/SystemWallet";
 
-import Users
-  from "./pages/Users";
+// Agent Pages
+import AgentDashboard from "./pages/agent/Dashboard";
+import AgentDeposit from "./pages/agent/Deposit";
+import AgentHistory from "./pages/agent/History";
+import AgentCashTransfer from "./pages/agent/CashTransfer";
+import AgentCashPayout from "./pages/agent/CashPayout";
 
-import UserKycDetail
-  from "./pages/UserKycDetail";
+// Components & Layouts
+import ProtectedRoute from "./components/ProtectedRoute";
+import MainLayout from "./layouts/MainLayout";
 
-import Agents
-  from "./pages/Agents";
-
-import SystemWallet
-  from "./pages/SystemWallet";
-
-import AgentDashboard
-  from "./pages/AgentDashboard";
-
-import AgentDeposit
-  from "./pages/AgentDeposit";
-
-import AgentHistory
-  from "./pages/AgentHistory";
-
-import ProtectedRoute
-  from "./components/ProtectedRoute";
-
-import AgentCashTransfer
-  from "./pages/AgentCashTransfer";
-
-import AgentCashPayout
-  from "./pages/AgentCashPayout";
 export default function App() {
   return (
     <BrowserRouter>
-
       <Routes>
-
         {/* ROOT */}
-
         <Route
           path="/"
-          element={
-            <Navigate
-              to="/admin/login"
-              replace
-            />
-          }
+          element={<Navigate to="/admin/login" replace />}
         />
-
 
         {/* LOGIN */}
-
         <Route
           path="/admin/login"
-          element={
-            <AdminLogin />
-          }
+          element={<Login />}
         />
-
 
         {/* =================================================
             ADMIN ROUTES
         ================================================= */}
-
         <Route
-          path="/admin/dashboard"
           element={
-            <ProtectedRoute
-              roles={["admin"]}
-            >
-              <Dashboard />
+            <ProtectedRoute roles={["admin"]}>
+              <MainLayout />
             </ProtectedRoute>
           }
-        />
-
-
-        <Route
-          path="/admin/users"
-          element={
-            <ProtectedRoute
-              roles={["admin"]}
-            >
-              <Users />
-            </ProtectedRoute>
-          }
-        />
-
-
-        <Route
-          path="/admin/users/:id"
-          element={
-            <ProtectedRoute
-              roles={["admin"]}
-            >
-              <UserKycDetail />
-            </ProtectedRoute>
-          }
-        />
-
-
-        <Route
-          path="/admin/agents"
-          element={
-            <ProtectedRoute
-              roles={["admin"]}
-            >
-              <Agents />
-            </ProtectedRoute>
-          }
-        />
-
-
-        <Route
-          path="/admin/wallet"
-          element={
-            <ProtectedRoute
-              roles={["admin"]}
-            >
-              <SystemWallet />
-            </ProtectedRoute>
-          }
-        />
-
+        >
+          <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/users/:id" element={<UserKycDetail />} />
+          <Route path="/admin/agents" element={<Agents />} />
+          <Route path="/admin/wallet" element={<SystemWallet />} />
+        </Route>
 
         {/* =================================================
             AGENT ROUTES
         ================================================= */}
-
         <Route
-          path="/agent/dashboard"
           element={
-            <ProtectedRoute
-              roles={["agent"]}
-            >
-              <AgentDashboard />
+            <ProtectedRoute roles={["agent"]}>
+              <MainLayout />
             </ProtectedRoute>
           }
-        />
-
-<Route
-  path="/agent/cash-transfer"
-  element={
-    <ProtectedRoute
-      roles={["agent"]}
-    >
-      <AgentCashTransfer />
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/agent/cash-payout"
-  element={
-    <ProtectedRoute
-      roles={["agent"]}
-    >
-      <AgentCashPayout />
-    </ProtectedRoute>
-  }
-/>
-        <Route
-          path="/agent/deposit"
-          element={
-            <ProtectedRoute
-              roles={["agent"]}
-            >
-              <AgentDeposit />
-            </ProtectedRoute>
-          }
-        />
-
-
-        <Route
-          path="/agent/transactions"
-          element={
-            <ProtectedRoute
-              roles={["agent"]}
-            >
-              <AgentHistory />
-            </ProtectedRoute>
-          }
-        />
-
+        >
+          <Route path="/agent/dashboard" element={<AgentDashboard />} />
+          <Route path="/agent/cash-transfer" element={<AgentCashTransfer />} />
+          <Route path="/agent/cash-payout" element={<AgentCashPayout />} />
+          <Route path="/agent/deposit" element={<AgentDeposit />} />
+          <Route path="/agent/transactions" element={<AgentHistory />} />
+        </Route>
 
         {/* FALLBACK */}
-
-        <Route
-          path="*"
-          element={
-            <FallbackRoute />
-          }
-        />
-
+        <Route path="*" element={<FallbackRoute />} />
       </Routes>
-
     </BrowserRouter>
   );
 }
-
 
 /* =========================================================
    FALLBACK ROUTE
 ========================================================= */
 
 function FallbackRoute() {
-  const token =
-    localStorage.getItem(
-      "access_token"
-    );
+  const token = localStorage.getItem("access_token");
+  const rawUser = localStorage.getItem("user");
 
-  const rawUser =
-    localStorage.getItem(
-      "user"
-    );
-
-
-  if (
-    !token ||
-    !rawUser
-  ) {
-    return (
-      <Navigate
-        to="/admin/login"
-        replace
-      />
-    );
+  if (!token || !rawUser) {
+    return <Navigate to="/admin/login" replace />;
   }
-
 
   let user;
-
   try {
-    user =
-      JSON.parse(
-        rawUser
-      );
+    user = JSON.parse(rawUser);
   } catch {
     localStorage.clear();
-
-    return (
-      <Navigate
-        to="/admin/login"
-        replace
-      />
-    );
+    return <Navigate to="/admin/login" replace />;
   }
 
-
-  if (
-    user.role ===
-    "admin"
-  ) {
-    return (
-      <Navigate
-        to="/admin/dashboard"
-        replace
-      />
-    );
+  if (user.role === "admin") {
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
-
-  if (
-    user.role ===
-    "agent"
-  ) {
-    return (
-      <Navigate
-        to="/agent/dashboard"
-        replace
-      />
-    );
+  if (user.role === "agent") {
+    return <Navigate to="/agent/dashboard" replace />;
   }
 
-
-  return (
-    <Navigate
-      to="/admin/login"
-      replace
-    />
-  );
+  return <Navigate to="/admin/login" replace />;
 }

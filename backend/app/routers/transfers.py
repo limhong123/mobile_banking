@@ -3,6 +3,7 @@ import asyncio
 from datetime import (
     datetime,
     timezone,
+    timedelta,
 )
 
 from decimal import Decimal
@@ -1242,6 +1243,194 @@ async def transfer_history(
 
         "data":
             transactions,
+    }
+
+# =========================================================
+# TODAY EXPENSE
+# =========================================================
+
+@router.get("/today-expense")
+async def get_today_expense(
+    current_user: dict = Depends(
+        get_current_user
+    ),
+):
+    # =====================================================
+    # VALIDATE CUSTOMER
+    # =====================================================
+
+    require_customer(
+        current_user
+    )
+
+    user_id = str(
+        current_user[
+            "_id"
+        ]
+    )
+
+    # =====================================================
+    # CAMBODIA TIMEZONE UTC+7
+    # =====================================================
+
+    cambodia_timezone = timezone(
+        timedelta(
+            hours=7
+        )
+    )
+
+    now_cambodia = datetime.now(
+        cambodia_timezone
+    )
+
+    # =====================================================
+    # START OF TODAY
+    #
+    # Example:
+    # 2026-09-24 00:00:00 +07
+    # =====================================================
+
+    start_cambodia = (
+        now_cambodia.replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+    )
+
+    # =====================================================
+    # START OF TOMORROW
+    # =====================================================
+
+    end_cambodia = (
+        start_cambodia
+        + timedelta(
+            days=1
+        )
+    )
+
+    # =====================================================
+    # CONVERT TO UTC
+    #
+    # MongoDB transactions use UTC datetime.
+    # =====================================================
+
+    start_utc = (
+        start_cambodia.astimezone(
+            timezone.utc
+        )
+    )
+
+    end_utc = (
+        end_cambodia.astimezone(
+            timezone.utc
+        )
+    )
+
+    # =====================================================
+    # GET ONLY MONEY SENT BY CURRENT USER TODAY
+    # =====================================================
+
+    pipeline = [
+        {
+            "$match": {
+                "type":
+                    "transfer",
+
+                "sender_id":
+                    user_id,
+
+                "status":
+                    "success",
+
+                "created_at": {
+                    "$gte":
+                        start_utc,
+
+                    "$lt":
+                        end_utc,
+                },
+            },
+        },
+
+        {
+            "$group": {
+                "_id":
+                    None,
+
+                "expense": {
+                    "$sum":
+                        "$amount",
+                },
+
+                "transaction_count": {
+                    "$sum":
+                        1,
+                },
+            },
+        },
+    ]
+
+    result = None
+
+    async for item in db[
+        "transactions"
+    ].aggregate(
+        pipeline
+    ):
+        result = item
+        break
+
+    # =====================================================
+    # NO EXPENSE TODAY
+    # =====================================================
+
+    if not result:
+        return {
+            "success":
+                True,
+
+            "expense":
+                0.0,
+
+            "transaction_count":
+                0,
+
+            "date":
+                start_cambodia
+                .date()
+                .isoformat(),
+        }
+
+    # =====================================================
+    # RESPONSE
+    # =====================================================
+
+    return {
+        "success":
+            True,
+
+        "expense":
+            float(
+                result.get(
+                    "expense",
+                    0,
+                )
+        ),
+
+        "transaction_count":
+            int(
+                result.get(
+                    "transaction_count",
+                    0,
+                )
+        ),
+
+        "date":
+            start_cambodia
+            .date()
+            .isoformat(),
     }
 
 # =========================================================

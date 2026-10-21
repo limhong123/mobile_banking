@@ -14,10 +14,9 @@ from app.database import db
 async def generate_account_number():
     while True:
         account_number = (
-            "KHP"
-            + str(
+            str(
                 uuid4().int
-            )[:9]
+            )[:14]
         )
 
         exists = await db[

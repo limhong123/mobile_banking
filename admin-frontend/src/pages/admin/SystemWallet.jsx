@@ -11,13 +11,11 @@ import {
   X,
 } from "lucide-react";
 
-import Sidebar from "../components/Sidebar";
-
 import {
   fundSystemWallet,
   getSystemWallet,
   getSystemWalletHistory,
-} from "../api/adminApi";
+} from "../../api/adminApi";
 
 
 export default function SystemWallet() {
@@ -268,12 +266,7 @@ export default function SystemWallet() {
   // =====================================================
 
   return (
-    <div className="min-h-screen bg-slate-50">
-
-      <Sidebar />
-
-
-      <main className="ml-[255px] min-h-screen p-8">
+    <>
 
         {/* HEADER */}
 
@@ -867,8 +860,6 @@ export default function SystemWallet() {
           </div>
         )}
 
-      </main>
-
-    </div>
+      </>
   );
 }

@@ -8,18 +8,19 @@ import {
   Power,
   Search,
   UsersRound,
+  SlidersHorizontal,
 } from "lucide-react";
+
+import BalanceAdjustmentModal from "../../components/BalanceAdjustmentModal";
 
 import {
   useNavigate,
 } from "react-router-dom";
 
-import Sidebar from "../components/Sidebar";
-
 import {
   getUsers,
   toggleUserStatus,
-} from "../api/adminApi";
+} from "../../api/adminApi";
 
 
 export default function Users() {
@@ -40,6 +41,11 @@ export default function Users() {
     loading,
     setLoading,
   ] = useState(true);
+
+  const [
+    adjustTarget,
+    setAdjustTarget,
+  ] = useState(null);
 
 
   useEffect(() => {
@@ -219,12 +225,7 @@ export default function Users() {
 
 
   return (
-    <div className="min-h-screen bg-slate-50">
-
-      <Sidebar />
-
-
-      <main className="ml-[255px] min-h-screen p-8">
+    <>
 
         {/* HEADER */}
 
@@ -490,6 +491,24 @@ export default function Users() {
                             <button
                               type="button"
                               onClick={() =>
+                                setAdjustTarget({
+                                  id: user.id,
+                                  name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || "Customer",
+                                  phone: user.phone_number,
+                                  balance: user.balance,
+                                  currency: user.currency || "USD",
+                                  type: "user",
+                                })
+                              }
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                            >
+                              <SlidersHorizontal size={14} />
+                              Debit / Credit
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() =>
                                 handleView(
                                   user
                                 )
@@ -548,8 +567,13 @@ export default function Users() {
 
         </div>
 
-      </main>
+        <BalanceAdjustmentModal
+          isOpen={Boolean(adjustTarget)}
+          onClose={() => setAdjustTarget(null)}
+          target={adjustTarget}
+          onSuccess={loadUsers}
+        />
 
-    </div>
+      </>
   );
 }

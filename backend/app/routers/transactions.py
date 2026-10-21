@@ -624,6 +624,62 @@ async def get_transaction_history(
                 or 0
             )
 
+        elif transaction_type in ["credit", "admin_credit"]:
+
+            direction = "incoming"
+
+            counterparty_name = (
+                item.get(
+                    "description",
+                    "",
+                )
+                or "Credit Adjustment"
+            )
+
+            balance_before = float(
+                item.get(
+                    "balance_before",
+                    0,
+                )
+                or 0
+            )
+
+            balance_after = float(
+                item.get(
+                    "balance_after",
+                    0,
+                )
+                or 0
+            )
+
+        elif transaction_type in ["debit", "admin_debit"]:
+
+            direction = "outgoing"
+
+            counterparty_name = (
+                item.get(
+                    "description",
+                    "",
+                )
+                or "Debit Adjustment"
+            )
+
+            balance_before = float(
+                item.get(
+                    "balance_before",
+                    0,
+                )
+                or 0
+            )
+
+            balance_after = float(
+                item.get(
+                    "balance_after",
+                    0,
+                )
+                or 0
+            )
+
         result.append(
             {
                 "id":
@@ -946,6 +1002,66 @@ async def get_transaction_detail(
                 "",
             )
         )
+
+        balance_before = float(
+            item.get(
+                "balance_before",
+                0,
+            )
+            or 0
+        )
+
+        balance_after = float(
+            item.get(
+                "balance_after",
+                0,
+            )
+            or 0
+        )
+
+    elif transaction_type in ["credit", "admin_credit"]:
+
+        direction = "incoming"
+
+        counterparty_name = (
+            item.get(
+                "description",
+                "",
+            )
+            or "Credit Adjustment"
+        )
+
+        counterparty_account = "KhmerPay Central"
+
+        balance_before = float(
+            item.get(
+                "balance_before",
+                0,
+            )
+            or 0
+        )
+
+        balance_after = float(
+            item.get(
+                "balance_after",
+                0,
+            )
+            or 0
+        )
+
+    elif transaction_type in ["debit", "admin_debit"]:
+
+        direction = "outgoing"
+
+        counterparty_name = (
+            item.get(
+                "description",
+                "",
+            )
+            or "Debit Adjustment"
+        )
+
+        counterparty_account = "KhmerPay Central"
 
         balance_before = float(
             item.get(

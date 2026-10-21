@@ -12,18 +12,19 @@ import {
   ScanFace,
   User,
   Wallet,
+  SlidersHorizontal,
 } from "lucide-react";
+
+import BalanceAdjustmentModal from "../../components/BalanceAdjustmentModal";
 
 import {
   useNavigate,
   useParams,
 } from "react-router-dom";
 
-import Sidebar from "../components/Sidebar";
-
 import {
   getUserDetail,
-} from "../api/adminApi";
+} from "../../api/adminApi";
 
 
 export default function UserKycDetail() {
@@ -50,6 +51,11 @@ export default function UserKycDetail() {
     error,
     setError,
   ] = useState("");
+
+  const [
+    adjustOpen,
+    setAdjustOpen,
+  ] = useState(false);
 
 
   // =====================================================
@@ -241,12 +247,7 @@ export default function UserKycDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
-
-        <Sidebar />
-
-
-        <main className="ml-[255px] flex min-h-screen items-center justify-center">
+      <>
 
           <div className="text-center">
 
@@ -259,9 +260,7 @@ export default function UserKycDetail() {
 
           </div>
 
-        </main>
-
-      </div>
+        </>
     );
   }
 
@@ -275,12 +274,7 @@ export default function UserKycDetail() {
     !user
   ) {
     return (
-      <div className="min-h-screen bg-slate-50">
-
-        <Sidebar />
-
-
-        <main className="ml-[255px] min-h-screen p-8">
+      <>
 
           <button
             type="button"
@@ -306,9 +300,7 @@ export default function UserKycDetail() {
 
           </div>
 
-        </main>
-
-      </div>
+        </>
     );
   }
 
@@ -342,12 +334,14 @@ export default function UserKycDetail() {
   const nidFirstName =
     kyc.first_name ||
     nidData.first_name ||
+    user.first_name ||
     "";
 
 
   const nidLastName =
     kyc.last_name ||
     nidData.last_name ||
+    user.last_name ||
     "";
 
 
@@ -356,6 +350,7 @@ export default function UserKycDetail() {
     nidData.full_name ||
     `${nidFirstName} ${nidLastName}`
       .trim() ||
+    `${user.first_name || ""} ${user.last_name || ""}`.trim() ||
     "-";
 
 
@@ -363,6 +358,7 @@ export default function UserKycDetail() {
     kyc.date_of_birth ||
     nidData.date_of_birth ||
     nidData.dob ||
+    user.date_of_birth ||
     "-";
 
 
@@ -370,6 +366,21 @@ export default function UserKycDetail() {
     kyc.expiry_date ||
     nidData.expiry_date ||
     nidData.expiration_date ||
+    user.expiry_date ||
+    "-";
+
+
+  const gender =
+    kyc.gender ||
+    nidData.gender ||
+    user.gender ||
+    "-";
+
+
+  const address =
+    kyc.address ||
+    nidData.address ||
+    user.address ||
     "-";
 
 
@@ -377,6 +388,14 @@ export default function UserKycDetail() {
     kyc.source ||
     nidData.source ||
     "-";
+
+
+  const ocrStatus =
+    kyc.ocr_completed || nidData.ocr_completed
+      ? "OCR Verified"
+      : nidNumber !== "-"
+        ? "Extracted"
+        : "Pending";
 
 
   // =====================================================
@@ -463,44 +482,47 @@ export default function UserKycDetail() {
   // =====================================================
 
   return (
-    <div className="min-h-screen bg-slate-50">
-
-      <Sidebar />
-
-
-      <main className="ml-[255px] min-h-screen p-8">
+    <>
 
         {/* HEADER */}
 
-        <div className="mb-7">
+        <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  "/admin/users"
+                )
+              }
+              className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-blue-600"
+            >
+              <ArrowLeft
+                size={17}
+              />
+
+              Back to Users
+            </button>
+
+
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              Customer Detail & KYC
+            </h1>
+
+
+            <p className="mt-1 text-sm text-slate-500">
+              Manage wallet balance, NID and biometric verification
+            </p>
+          </div>
 
           <button
             type="button"
-            onClick={() =>
-              navigate(
-                "/admin/users"
-              )
-            }
-            className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-blue-600"
+            onClick={() => setAdjustOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700"
           >
-            <ArrowLeft
-              size={17}
-            />
-
-            Back to Users
+            <SlidersHorizontal size={16} />
+            Debit / Credit Balance
           </button>
-
-
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            KYC Detail
-          </h1>
-
-
-          <p className="mt-1 text-sm text-slate-500">
-            View customer NID and
-            live face verification result
-          </p>
-
         </div>
 
 
@@ -630,6 +652,22 @@ export default function UserKycDetail() {
 
 
             <Detail
+              label="Gender"
+              value={
+                gender
+              }
+            />
+
+
+            <Detail
+              label="Address"
+              value={
+                address
+              }
+            />
+
+
+            <Detail
               label="Data Source"
               value={
                 dataSource
@@ -643,6 +681,14 @@ export default function UserKycDetail() {
                 user.is_verified
                   ? "Yes"
                   : "No"
+              }
+            />
+
+
+            <Detail
+              label="OCR Status"
+              value={
+                ocrStatus
               }
             />
 
@@ -792,9 +838,23 @@ export default function UserKycDetail() {
 
         </div>
 
-      </main>
+        {user && (
+          <BalanceAdjustmentModal
+            isOpen={adjustOpen}
+            onClose={() => setAdjustOpen(false)}
+            target={{
+              id: user.id || id,
+              name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || "Customer",
+              phone: user.phone_number,
+              balance: user.balance,
+              currency: user.currency || "USD",
+              type: "user",
+            }}
+            onSuccess={loadUser}
+          />
+        )}
 
-    </div>
+      </>
   );
 }
 

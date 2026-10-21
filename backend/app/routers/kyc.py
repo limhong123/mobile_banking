@@ -296,68 +296,39 @@ async def upload_nid_front(
     # SAVE OCR IF AVAILABLE
     # -----------------------------------------------------
 
-    if ocr_data:
-        nid_data = {
-            "first_name":
-                ocr_data.get(
-                    "first_name",
-                    "",
-                ),
+    nid_data = {
+        "nid_number": ocr_data.get("nid_number", ""),
+        "first_name": ocr_data.get("first_name", ""),
+        "last_name": ocr_data.get("last_name", ""),
+        "full_name": ocr_data.get("full_name", ""),
+        "date_of_birth": ocr_data.get("date_of_birth", ""),
+        "expiry_date": ocr_data.get("expiry_date", ""),
+        "gender": ocr_data.get("gender", ""),
+        "address": ocr_data.get("address", ""),
+        "source": ocr_data.get("source", "ocr"),
+    }
 
-            "last_name":
-                ocr_data.get(
-                    "last_name",
-                    "",
-                ),
+    set_fields = {
+        "kyc.nid_data": nid_data,
+        "nid_data": nid_data,
+        "kyc.ocr_completed": bool(ocr_data.get("ocr_completed", False)),
+        "kyc.ocr_raw_text": ocr_data.get("raw_text", ""),
+        "kyc.mrz_lines": ocr_data.get("mrz_lines", []),
+    }
 
-            "nid_number":
-                ocr_data.get(
-                    "nid_number",
-                    "",
-                ),
+    if not current_user.get("first_name") and nid_data.get("first_name"):
+        set_fields["first_name"] = nid_data["first_name"]
+    if not current_user.get("last_name") and nid_data.get("last_name"):
+        set_fields["last_name"] = nid_data["last_name"]
 
-            "date_of_birth":
-                ocr_data.get(
-                    "date_of_birth",
-                    "",
-                ),
-
-            "expiry_date":
-                ocr_data.get(
-                    "expiry_date",
-                    "",
-                ),
-
-            "source":
-                "ocr_mrz",
-        }
-
-        await users.update_one(
-            {
-                "_id":
-                    current_user["_id"],
-            },
-            {
-                "$set": {
-                    "kyc.nid_data":
-                        nid_data,
-
-                    "kyc.ocr_completed":
-                        bool(
-                            ocr_data.get(
-                                "ocr_completed",
-                                False,
-                            )
-                        ),
-
-                    "kyc.ocr_raw_text":
-                        ocr_data.get(
-                            "raw_text",
-                            "",
-                        ),
-                },
-            },
-        )
+    await users.update_one(
+        {
+            "_id": current_user["_id"],
+        },
+        {
+            "$set": set_fields,
+        },
+    )
 
     # -----------------------------------------------------
     # EXTRACT FACE FROM NID
@@ -456,6 +427,9 @@ async def upload_nid_front(
                     False,
                 )
             ),
+
+        "nid_data":
+            nid_data,
 
         "next_step":
             "face_scan",
@@ -741,6 +715,8 @@ async def verify_face(
             },
         )
 
+        nid_data = kyc.get("nid_data") or fresh_user.get("nid_data") or {}
+
         return {
             "success":
                 True,
@@ -756,6 +732,9 @@ async def verify_face(
 
             "kyc_status":
                 "approved",
+
+            "nid_data":
+                nid_data,
 
             "next_step":
                 "result",
@@ -875,4 +854,46 @@ async def get_kyc_status(
 
         "next_step":
             next_step,
+    }
+
+
+# =========================================================
+# GET IDENTITY INFORMATION
+# =========================================================
+
+@router.get("/identity")
+async def get_identity_information(
+    current_user: dict = Depends(
+        get_current_kyc_user
+    ),
+):
+    users = db["users"]
+    fresh_user = await users.find_one({"_id": current_user["_id"]})
+    if not fresh_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    kyc = fresh_user.get("kyc") or {}
+    nid_data = kyc.get("nid_data") or fresh_user.get("nid_data") or {}
+
+    first_name = nid_data.get("first_name") or fresh_user.get("first_name", "")
+    last_name = nid_data.get("last_name") or fresh_user.get("last_name", "")
+    full_name = nid_data.get("full_name") or f"{last_name} {first_name}".strip()
+
+    nid_front = kyc.get("nid_front_path") or fresh_user.get("nid_image")
+
+    return {
+        "success": True,
+        "kyc_status": fresh_user.get("kyc_status", "not_submitted"),
+        "is_verified": bool(fresh_user.get("is_verified", False)),
+        "face_verified": bool(kyc.get("face_verified", False)),
+        "nid_number": nid_data.get("nid_number", ""),
+        "first_name": first_name,
+        "last_name": last_name,
+        "full_name": full_name,
+        "date_of_birth": nid_data.get("date_of_birth", ""),
+        "expiry_date": nid_data.get("expiry_date", ""),
+        "gender": nid_data.get("gender", ""),
+        "address": nid_data.get("address", ""),
+        "nid_front_url": nid_front,
+        "source": nid_data.get("source", "ocr"),
     }

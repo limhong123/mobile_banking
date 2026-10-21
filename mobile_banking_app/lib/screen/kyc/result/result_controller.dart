@@ -25,6 +25,12 @@ class ResultController
   final matchScore =
       0.0.obs;
 
+  final nidNumber =
+      ''.obs;
+
+  final fullName =
+      ''.obs;
+
 
   @override
   void onInit() {
@@ -63,6 +69,12 @@ class ResultController
                     '0',
               ) ??
               0;
+
+      if (arguments['nid_data'] is Map) {
+        final nid = arguments['nid_data'];
+        nidNumber.value = nid['nid_number']?.toString() ?? '';
+        fullName.value = nid['full_name']?.toString() ?? '';
+      }
     }
 
 

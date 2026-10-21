@@ -196,18 +196,8 @@ async def agent_me(
         )
     )
 
-    daily_limit = float(
-        current_agent.get(
-            "daily_transaction_limit",
-            5000,
-        )
-    )
-
-    remaining_limit = max(
-        daily_limit
-        - today_total,
-        0,
-    )
+    daily_limit = None
+    remaining_limit = None
 
     return {
         "success":
@@ -301,13 +291,13 @@ async def agent_me(
                 else "USD",
 
             "daily_transaction_limit":
-                daily_limit,
+                None,
 
             "today_transaction_amount":
                 today_total,
 
             "remaining_daily_limit":
-                remaining_limit,
+                None,
         },
     }
 
@@ -492,32 +482,15 @@ async def agent_deposit(
             ),
         )
 
-    if amount > Decimal(
-        "100000.00"
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Maximum deposit amount is 100000"
-            ),
-        )
+
 
     agent_id = str(
         current_agent["_id"]
     )
 
     # =====================================================
-    # DAILY LIMIT
+    # TODAY STATS (NO LIMIT FOR DEPOSIT AGENT)
     # =====================================================
-
-    daily_limit = Decimal(
-        str(
-            current_agent.get(
-                "daily_transaction_limit",
-                5000,
-            )
-        )
-    )
 
     today_total = Decimal(
         str(
@@ -531,21 +504,6 @@ async def agent_deposit(
         today_total
         + amount
     )
-
-    if projected_total > daily_limit:
-        remaining = max(
-            daily_limit
-            - today_total,
-            Decimal("0.00"),
-        )
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Daily transaction limit exceeded. "
-                f"Remaining limit: ${remaining:.2f}"
-            ),
-        )
 
     # =====================================================
     # CUSTOMER
@@ -999,10 +957,7 @@ async def agent_deposit(
             ),
         ) from error
 
-    remaining_daily_limit = (
-        daily_limit
-        - projected_total
-    )
+
 
     return {
         "success":
@@ -1047,9 +1002,7 @@ async def agent_deposit(
                 ),
 
             "daily_transaction_limit":
-                float(
-                    daily_limit
-                ),
+                None,
 
             "today_transaction_amount":
                 float(
@@ -1057,9 +1010,7 @@ async def agent_deposit(
                 ),
 
             "remaining_daily_limit":
-                float(
-                    remaining_daily_limit
-                ),
+                None,
 
             "status":
                 "success",
@@ -1318,18 +1269,8 @@ async def agent_dashboard(
         )
     )
 
-    daily_limit = float(
-        current_agent.get(
-            "daily_transaction_limit",
-            5000,
-        )
-    )
-
-    remaining_limit = max(
-        daily_limit
-        - today_total,
-        0,
-    )
+    daily_limit = None
+    remaining_limit = None
 
     recent_cursor = (
         db[
@@ -1412,13 +1353,13 @@ async def agent_dashboard(
                 wallet_frozen,
 
             "daily_transaction_limit":
-                daily_limit,
+                None,
 
             "today_transaction_amount":
                 today_total,
 
             "remaining_daily_limit":
-                remaining_limit,
+                None,
 
             "total_transactions":
                 total_transactions,

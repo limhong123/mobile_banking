@@ -2,8 +2,15 @@ from datetime import (
     datetime,
     timezone,
 )
+from decimal import Decimal
 from pathlib import Path
+from uuid import uuid4
 from bson import ObjectId
+from pymongo import ReturnDocument
+
+from app.schemas.account import (
+    BalanceAdjustmentRequest,
+)
 
 from fastapi import (
     APIRouter,
@@ -350,79 +357,63 @@ def serialize_user(
 
 
     nid_first_name = (
-        nid_data.get(
-            "first_name"
-        )
+        nid_data.get("first_name")
+        or kyc.get("first_name")
+        or user.get("first_name")
         or ""
     )
-
 
     nid_last_name = (
-        nid_data.get(
-            "last_name"
-        )
+        nid_data.get("last_name")
+        or kyc.get("last_name")
+        or user.get("last_name")
         or ""
     )
 
-
     full_name = (
-        nid_data.get(
-            "full_name"
-        )
+        nid_data.get("full_name")
+        or kyc.get("full_name")
         or (
-            f"{nid_first_name} "
-            f"{nid_last_name}"
+            f"{nid_first_name} {nid_last_name}"
         ).strip()
     )
 
-
     date_of_birth = (
-        nid_data.get(
-            "date_of_birth"
-        )
-        or nid_data.get(
-            "dob"
-        )
+        nid_data.get("date_of_birth")
+        or nid_data.get("dob")
+        or kyc.get("date_of_birth")
+        or user.get("date_of_birth")
         or ""
     )
-
 
     expiry_date = (
-        nid_data.get(
-            "expiry_date"
-        )
-        or nid_data.get(
-            "expiration_date"
-        )
+        nid_data.get("expiry_date")
+        or nid_data.get("expiration_date")
+        or kyc.get("expiry_date")
+        or user.get("expiry_date")
         or ""
     )
-
 
     gender = (
-        nid_data.get(
-            "gender"
-        )
+        nid_data.get("gender")
+        or kyc.get("gender")
+        or user.get("gender")
         or ""
     )
-
 
     address = (
-        nid_data.get(
-            "address"
-        )
+        nid_data.get("address")
+        or kyc.get("address")
+        or user.get("address")
         or ""
     )
 
-
     source = (
-        nid_data.get(
-            "source"
-        )
+        nid_data.get("source")
+        or kyc.get("source")
         or (
             "legacy"
-            if user.get(
-                "nid_image"
-            )
+            if (user.get("nid_image") or user.get("nid_front_path"))
             else ""
         )
     )
@@ -1695,11 +1686,11 @@ async def create_agent(
             payload.branch_name
             .strip(),
 
-        "daily_transaction_limit":
-            float(
-                payload
-                .daily_transaction_limit
-            ),
+        "daily_transaction_limit": (
+            float(payload.daily_transaction_limit)
+            if payload.daily_transaction_limit is not None
+            else None
+        ),
 
         "pin":
             hash_pin(
@@ -1838,11 +1829,11 @@ async def create_agent(
                 payload.branch_name
                 .strip(),
 
-            "daily_transaction_limit":
-                float(
-                    payload
-                    .daily_transaction_limit
-                ),
+            "daily_transaction_limit": (
+                float(payload.daily_transaction_limit)
+                if payload.daily_transaction_limit is not None
+                else None
+            ),
 
             "balance":
                 0.0,
@@ -2181,6 +2172,9 @@ async def update_agent(
         update_data[
             "phone_number"
         ] = phone
+
+    if payload.daily_transaction_limit is not None:
+        update_data["daily_transaction_limit"] = float(payload.daily_transaction_limit)
 
     if not update_data:
         raise HTTPException(
@@ -2689,4 +2683,593 @@ async def get_agent_transactions(
 
         "data":
             results,
+    }
+
+# =========================================================
+# USER BALANCE ADJUSTMENTS (CREDIT / DEBIT)
+# =========================================================
+
+@router.post(
+    "/users/{user_id}/credit"
+)
+async def admin_credit_user(
+    user_id: str,
+    payload: BalanceAdjustmentRequest,
+    current_admin: dict = Depends(
+        require_admin,
+    ),
+):
+    try:
+        user_object_id = ObjectId(
+            user_id
+        )
+    except Exception as error:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid user ID",
+        ) from error
+
+    user = await db["users"].find_one(
+        {
+            "_id": user_object_id,
+            "role": "user",
+        }
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
+    amount = Decimal(
+        str(payload.amount)
+    ).quantize(
+        Decimal("0.01")
+    )
+
+    if amount <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Amount must be greater than 0",
+        )
+
+    now = datetime.now(
+        timezone.utc
+    )
+
+    account = await db["accounts"].find_one(
+        {
+            "user_id": user_id,
+        }
+    )
+
+    if account and account.get("is_frozen", False):
+        raise HTTPException(
+            status_code=403,
+            detail="User account is frozen",
+        )
+
+    balance_before = Decimal(
+        str(account.get("balance", 0.0) if account else 0.0)
+    )
+
+    updated_account = await db["accounts"].find_one_and_update(
+        {
+            "user_id": user_id,
+            "is_frozen": {"$ne": True},
+        },
+        {
+            "$inc": {
+                "balance": float(amount),
+            },
+            "$set": {
+                "updated_at": now,
+            },
+            "$setOnInsert": {
+                "user_id": user_id,
+                "currency": "USD",
+                "is_frozen": False,
+                "created_at": now,
+            },
+        },
+        upsert=True,
+        return_document=ReturnDocument.AFTER,
+    )
+
+    balance_after = Decimal(
+        str(updated_account.get("balance", 0.0))
+    )
+    tx_id = "ADJ-CR-" + uuid4().hex[:10].upper()
+
+    customer_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+    admin_name = f"{current_admin.get('first_name', '')} {current_admin.get('last_name', '')}".strip() or current_admin.get("username", "Admin")
+
+    tx_doc = {
+        "transaction_id": tx_id,
+        "user_id": user_id,
+        "account_id": str(updated_account["_id"]),
+        "customer_name": customer_name,
+        "customer_phone": user.get("phone_number", ""),
+        "type": "credit",
+        "direction": "incoming",
+        "amount": float(amount),
+        "currency": updated_account.get("currency", "USD"),
+        "balance_before": float(balance_before),
+        "balance_after": float(balance_after),
+        "status": "success",
+        "description": payload.description or "Admin manual credit adjustment",
+        "reference": payload.reference or "",
+        "adjustment_type": "credit",
+        "performed_by": {
+            "admin_id": str(current_admin["_id"]),
+            "admin_name": admin_name,
+            "role": current_admin.get("role", "admin"),
+        },
+        "created_at": now,
+    }
+
+    await db["transactions"].insert_one(tx_doc)
+
+    return {
+        "success": True,
+        "message": f"Successfully credited ${float(amount):,.2f} to {customer_name or 'user'}",
+        "data": {
+            "transaction_id": tx_id,
+            "user_id": user_id,
+            "customer_name": customer_name,
+            "type": "credit",
+            "amount": float(amount),
+            "currency": updated_account.get("currency", "USD"),
+            "balance_before": float(balance_before),
+            "balance_after": float(balance_after),
+            "description": tx_doc["description"],
+            "created_at": now,
+        },
+    }
+
+
+@router.post(
+    "/users/{user_id}/debit"
+)
+async def admin_debit_user(
+    user_id: str,
+    payload: BalanceAdjustmentRequest,
+    current_admin: dict = Depends(
+        require_admin,
+    ),
+):
+    try:
+        user_object_id = ObjectId(
+            user_id
+        )
+    except Exception as error:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid user ID",
+        ) from error
+
+    user = await db["users"].find_one(
+        {
+            "_id": user_object_id,
+            "role": "user",
+        }
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
+    amount = Decimal(
+        str(payload.amount)
+    ).quantize(
+        Decimal("0.01")
+    )
+
+    if amount <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Amount must be greater than 0",
+        )
+
+    now = datetime.now(
+        timezone.utc
+    )
+
+    account = await db["accounts"].find_one(
+        {
+            "user_id": user_id,
+        }
+    )
+
+    if not account:
+        raise HTTPException(
+            status_code=400,
+            detail="User has no active wallet account",
+        )
+
+    if account.get("is_frozen", False):
+        raise HTTPException(
+            status_code=403,
+            detail="User account is frozen",
+        )
+
+    balance_before = Decimal(
+        str(account.get("balance", 0.0))
+    )
+
+    if balance_before < amount:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Insufficient funds. Current balance is ${float(balance_before):,.2f}, cannot debit ${float(amount):,.2f}",
+        )
+
+    updated_account = await db["accounts"].find_one_and_update(
+        {
+            "user_id": user_id,
+            "balance": {
+                "$gte": float(amount),
+            },
+            "is_frozen": {"$ne": True},
+        },
+        {
+            "$inc": {
+                "balance": -float(amount),
+            },
+            "$set": {
+                "updated_at": now,
+            },
+        },
+        return_document=ReturnDocument.AFTER,
+    )
+
+    if not updated_account:
+        raise HTTPException(
+            status_code=400,
+            detail="Failed to debit account: insufficient funds or account locked",
+        )
+
+    balance_after = Decimal(
+        str(updated_account.get("balance", 0.0))
+    )
+    tx_id = "ADJ-DR-" + uuid4().hex[:10].upper()
+
+    customer_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+    admin_name = f"{current_admin.get('first_name', '')} {current_admin.get('last_name', '')}".strip() or current_admin.get("username", "Admin")
+
+    tx_doc = {
+        "transaction_id": tx_id,
+        "user_id": user_id,
+        "account_id": str(updated_account["_id"]),
+        "customer_name": customer_name,
+        "customer_phone": user.get("phone_number", ""),
+        "type": "debit",
+        "direction": "outgoing",
+        "amount": float(amount),
+        "currency": updated_account.get("currency", "USD"),
+        "balance_before": float(balance_before),
+        "balance_after": float(balance_after),
+        "status": "success",
+        "description": payload.description or "Admin manual debit adjustment",
+        "reference": payload.reference or "",
+        "adjustment_type": "debit",
+        "performed_by": {
+            "admin_id": str(current_admin["_id"]),
+            "admin_name": admin_name,
+            "role": current_admin.get("role", "admin"),
+        },
+        "created_at": now,
+    }
+
+    await db["transactions"].insert_one(tx_doc)
+
+    return {
+        "success": True,
+        "message": f"Successfully debited ${float(amount):,.2f} from {customer_name or 'user'}",
+        "data": {
+            "transaction_id": tx_id,
+            "user_id": user_id,
+            "customer_name": customer_name,
+            "type": "debit",
+            "amount": float(amount),
+            "currency": updated_account.get("currency", "USD"),
+            "balance_before": float(balance_before),
+            "balance_after": float(balance_after),
+            "description": tx_doc["description"],
+            "created_at": now,
+        },
+    }
+
+
+# =========================================================
+# AGENT BALANCE ADJUSTMENTS (CREDIT / DEBIT)
+# =========================================================
+
+@router.post(
+    "/agents/{agent_id}/credit"
+)
+async def admin_credit_agent(
+    agent_id: str,
+    payload: BalanceAdjustmentRequest,
+    current_admin: dict = Depends(
+        require_admin,
+    ),
+):
+    try:
+        agent_object_id = ObjectId(
+            agent_id
+        )
+    except Exception as error:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid agent ID",
+        ) from error
+
+    agent = await db["users"].find_one(
+        {
+            "_id": agent_object_id,
+            "role": "agent",
+        }
+    )
+
+    if not agent:
+        raise HTTPException(
+            status_code=404,
+            detail="Agent not found",
+        )
+
+    amount = Decimal(
+        str(payload.amount)
+    ).quantize(
+        Decimal("0.01")
+    )
+
+    if amount <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Amount must be greater than 0",
+        )
+
+    now = datetime.now(
+        timezone.utc
+    )
+
+    wallet = await db["agent_wallets"].find_one(
+        {
+            "agent_id": agent_id,
+        }
+    )
+
+    if wallet and wallet.get("is_frozen", False):
+        raise HTTPException(
+            status_code=403,
+            detail="Agent wallet is frozen",
+        )
+
+    balance_before = Decimal(
+        str(wallet.get("balance", 0.0) if wallet else 0.0)
+    )
+
+    updated_wallet = await db["agent_wallets"].find_one_and_update(
+        {
+            "agent_id": agent_id,
+            "is_frozen": {"$ne": True},
+        },
+        {
+            "$inc": {
+                "balance": float(amount),
+            },
+            "$set": {
+                "updated_at": now,
+            },
+            "$setOnInsert": {
+                "agent_id": agent_id,
+                "currency": "USD",
+                "is_frozen": False,
+                "created_at": now,
+            },
+        },
+        upsert=True,
+        return_document=ReturnDocument.AFTER,
+    )
+
+    balance_after = Decimal(
+        str(updated_wallet.get("balance", 0.0))
+    )
+    tx_id = "AGT-CR-" + uuid4().hex[:10].upper()
+    agent_name = f"{agent.get('first_name', '')} {agent.get('last_name', '')}".strip()
+    admin_name = f"{current_admin.get('first_name', '')} {current_admin.get('last_name', '')}".strip() or current_admin.get("username", "Admin")
+
+    tx_doc = {
+        "transaction_id": tx_id,
+        "agent_id": agent_id,
+        "agent_name": agent_name,
+        "type": "credit",
+        "direction": "incoming",
+        "amount": float(amount),
+        "currency": updated_wallet.get("currency", "USD"),
+        "balance_before": float(balance_before),
+        "balance_after": float(balance_after),
+        "status": "success",
+        "description": payload.description or "Admin manual credit to agent",
+        "reference": payload.reference or "",
+        "adjustment_type": "credit",
+        "performed_by": {
+            "admin_id": str(current_admin["_id"]),
+            "admin_name": admin_name,
+            "role": current_admin.get("role", "admin"),
+        },
+        "created_at": now,
+    }
+
+    await db["transactions"].insert_one(tx_doc)
+
+    return {
+        "success": True,
+        "message": f"Successfully credited ${float(amount):,.2f} to agent {agent_name or agent_id}",
+        "data": {
+            "transaction_id": tx_id,
+            "agent_id": agent_id,
+            "agent_name": agent_name,
+            "type": "credit",
+            "amount": float(amount),
+            "currency": updated_wallet.get("currency", "USD"),
+            "balance_before": float(balance_before),
+            "balance_after": float(balance_after),
+            "description": tx_doc["description"],
+            "created_at": now,
+        },
+    }
+
+
+@router.post(
+    "/agents/{agent_id}/debit"
+)
+async def admin_debit_agent(
+    agent_id: str,
+    payload: BalanceAdjustmentRequest,
+    current_admin: dict = Depends(
+        require_admin,
+    ),
+):
+    try:
+        agent_object_id = ObjectId(
+            agent_id
+        )
+    except Exception as error:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid agent ID",
+        ) from error
+
+    agent = await db["users"].find_one(
+        {
+            "_id": agent_object_id,
+            "role": "agent",
+        }
+    )
+
+    if not agent:
+        raise HTTPException(
+            status_code=404,
+            detail="Agent not found",
+        )
+
+    amount = Decimal(
+        str(payload.amount)
+    ).quantize(
+        Decimal("0.01")
+    )
+
+    if amount <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Amount must be greater than 0",
+        )
+
+    now = datetime.now(
+        timezone.utc
+    )
+
+    wallet = await db["agent_wallets"].find_one(
+        {
+            "agent_id": agent_id,
+        }
+    )
+
+    if not wallet:
+        raise HTTPException(
+            status_code=400,
+            detail="Agent has no wallet balance to debit",
+        )
+
+    if wallet.get("is_frozen", False):
+        raise HTTPException(
+            status_code=403,
+            detail="Agent wallet is frozen",
+        )
+
+    balance_before = Decimal(
+        str(wallet.get("balance", 0.0))
+    )
+
+    if balance_before < amount:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Insufficient agent funds. Current balance is ${float(balance_before):,.2f}, cannot debit ${float(amount):,.2f}",
+        )
+
+    updated_wallet = await db["agent_wallets"].find_one_and_update(
+        {
+            "agent_id": agent_id,
+            "balance": {
+                "$gte": float(amount),
+            },
+            "is_frozen": {"$ne": True},
+        },
+        {
+            "$inc": {
+                "balance": -float(amount),
+            },
+            "$set": {
+                "updated_at": now,
+            },
+        },
+        return_document=ReturnDocument.AFTER,
+    )
+
+    if not updated_wallet:
+        raise HTTPException(
+            status_code=400,
+            detail="Failed to debit agent: insufficient balance or wallet frozen",
+        )
+
+    balance_after = Decimal(
+        str(updated_wallet.get("balance", 0.0))
+    )
+    tx_id = "AGT-DR-" + uuid4().hex[:10].upper()
+    agent_name = f"{agent.get('first_name', '')} {agent.get('last_name', '')}".strip()
+    admin_name = f"{current_admin.get('first_name', '')} {current_admin.get('last_name', '')}".strip() or current_admin.get("username", "Admin")
+
+    tx_doc = {
+        "transaction_id": tx_id,
+        "agent_id": agent_id,
+        "agent_name": agent_name,
+        "type": "debit",
+        "direction": "outgoing",
+        "amount": float(amount),
+        "currency": updated_wallet.get("currency", "USD"),
+        "balance_before": float(balance_before),
+        "balance_after": float(balance_after),
+        "status": "success",
+        "description": payload.description or "Admin manual debit from agent",
+        "reference": payload.reference or "",
+        "adjustment_type": "debit",
+        "performed_by": {
+            "admin_id": str(current_admin["_id"]),
+            "admin_name": admin_name,
+            "role": current_admin.get("role", "admin"),
+        },
+        "created_at": now,
+    }
+
+    await db["transactions"].insert_one(tx_doc)
+
+    return {
+        "success": True,
+        "message": f"Successfully debited ${float(amount):,.2f} from agent {agent_name or agent_id}",
+        "data": {
+            "transaction_id": tx_id,
+            "agent_id": agent_id,
+            "agent_name": agent_name,
+            "type": "debit",
+            "amount": float(amount),
+            "currency": updated_wallet.get("currency", "USD"),
+            "balance_before": float(balance_before),
+            "balance_after": float(balance_after),
+            "description": tx_doc["description"],
+            "created_at": now,
+        },
     }

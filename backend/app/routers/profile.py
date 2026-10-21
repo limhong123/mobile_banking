@@ -14,6 +14,13 @@ MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 
 @router.get("/")
 async def get_profile(current_user: dict = Depends(get_current_user)):
+    kyc = current_user.get("kyc") or {}
+    nid_data = kyc.get("nid_data") or current_user.get("nid_data") or {}
+
+    first_name = nid_data.get("first_name") or current_user.get("first_name", "")
+    last_name = nid_data.get("last_name") or current_user.get("last_name", "")
+    full_name = nid_data.get("full_name") or f"{last_name} {first_name}".strip()
+
     return {
         "id": str(current_user["_id"]),
         "first_name": current_user["first_name"],
@@ -23,6 +30,14 @@ async def get_profile(current_user: dict = Depends(get_current_user)):
         "kyc_status": current_user["kyc_status"],
         "profile_photo": current_user.get("profile_photo"),
         "role": current_user.get("role", "user"),
+        "nid_number": nid_data.get("nid_number", ""),
+        "full_name": full_name,
+        "date_of_birth": nid_data.get("date_of_birth", ""),
+        "expiry_date": nid_data.get("expiry_date", ""),
+        "gender": nid_data.get("gender", ""),
+        "address": nid_data.get("address", ""),
+        "nid_front_path": kyc.get("nid_front_path") or current_user.get("nid_image") or "",
+        "nid_data": nid_data,
     }
 
 
@@ -55,14 +70,16 @@ async def upload_profile_photo(file: UploadFile = File(...), current_user: dict 
 
     filename = f"{uuid.uuid4()}{ext}"
     filepath = os.path.join(UPLOAD_DIR, "profile", filename)
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
     with open(filepath, "wb") as f:
         f.write(content)
 
+    db_filepath = f"{UPLOAD_DIR}/profile/{filename}"
     users_collection = db["users"]
     await users_collection.update_one(
         {"_id": current_user["_id"]},
-        {"$set": {"profile_photo": filepath}}
+        {"$set": {"profile_photo": db_filepath}}
     )
 
-    return {"message": "Profile photo uploaded successfully", "path": filepath}
+    return {"message": "Profile photo uploaded successfully", "path": db_filepath}

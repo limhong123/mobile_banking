@@ -11,12 +11,9 @@ import {
   UserRound,
 } from "lucide-react";
 
-import Sidebar
-  from "../components/Sidebar";
-
 import {
   createCashTransfer,
-} from "../api/cashTransferApi";
+} from "../../api/cashTransferApi";
 
 
 export default function AgentCashTransfer() {
@@ -276,12 +273,7 @@ export default function AgentCashTransfer() {
   // =====================================================
 
   return (
-    <div className="min-h-screen bg-slate-50">
-
-      <Sidebar />
-
-
-      <main className="ml-[255px] min-h-screen p-8">
+    <>
 
         {/* =================================================
             HEADER
@@ -747,9 +739,7 @@ export default function AgentCashTransfer() {
 
         </div>
 
-      </main>
-
-    </div>
+      </>
   );
 }
 

@@ -464,65 +464,9 @@ class _DetailBody extends StatelessWidget {
               height: 16,
             ),
 
-          // =================================================
-          // BALANCE
-          // =================================================
+         
 
-          _SectionCard(
-            title: 'Balance',
-            children: [
-              _DetailRow(
-                title: 'Balance Before',
-                value:
-                    '${_currencySymbol()}'
-                    '${transaction.balanceBefore.toStringAsFixed(2)}',
-              ),
-
-              _divider(),
-
-              _DetailRow(
-                title: 'Balance After',
-                value:
-                    '${_currencySymbol()}'
-                    '${transaction.balanceAfter.toStringAsFixed(2)}',
-              ),
-            ],
-          ),
-
-          if (
-            transaction
-                .description
-                .isNotEmpty
-          ) ...[
-            const SizedBox(
-              height: 16,
-            ),
-
-            // =================================================
-            // DESCRIPTION
-            // =================================================
-
-            _SectionCard(
-              title: 'Description',
-              children: [
-                Align(
-                  alignment:
-                      Alignment.centerLeft,
-                  child: Text(
-                    transaction.description,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      height: 1.5,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-
-          const SizedBox(
-            height: 30,
-          ),
+            
         ],
       ),
     );

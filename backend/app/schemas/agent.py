@@ -58,10 +58,9 @@ class AgentCreate(BaseModel):
         max_length=150,
     )
 
-    daily_transaction_limit: float = Field(
-        default=5000,
-        gt=0,
-        le=1000000,
+    daily_transaction_limit: float | None = Field(
+        default=None,
+        ge=0,
     )
 
     pin: str = Field(
@@ -142,8 +141,7 @@ class AgentUpdate(BaseModel):
 
     daily_transaction_limit: float | None = Field(
         default=None,
-        gt=0,
-        le=1000000,
+        ge=0,
     )
 
 
@@ -174,7 +172,6 @@ class AgentDeposit(BaseModel):
     amount: float = Field(
         ...,
         gt=0,
-        le=100000,
     )
 
     description: str | None = None

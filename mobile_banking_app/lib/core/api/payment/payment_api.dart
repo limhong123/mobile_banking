@@ -193,21 +193,51 @@ class PaymentApi {
     );
   }
 
-  Future<Map<String, dynamic>>
-    getTransactions() async {
-  final dynamic response =
-      await baseApi.get(
-    endpoint:
-        '/transfers/history',
-  );
 
-  if (response is! Map) {
-    throw Exception(
-      'Transaction history response invalid',
+  // =====================================================
+  // TRANSFER HISTORY
+  // =====================================================
+
+  Future<Map<String, dynamic>>
+      getTransactions() async {
+    final dynamic response =
+        await baseApi.get(
+      endpoint:
+          '/transfers/history',
+    );
+
+    if (response is! Map) {
+      throw Exception(
+        'Transaction history response invalid',
+      );
+    }
+
+    return Map<String, dynamic>.from(
+      response,
     );
   }
 
-  return Map<String, dynamic>.from(
-    response,
-  );
-}}
+
+  // =====================================================
+  // TODAY EXPENSE
+  // =====================================================
+
+  Future<Map<String, dynamic>>
+      getTodayExpense() async {
+    final dynamic response =
+        await baseApi.get(
+      endpoint:
+          '/transfers/today-expense',
+    );
+
+    if (response is! Map) {
+      throw Exception(
+        'Today expense response invalid',
+      );
+    }
+
+    return Map<String, dynamic>.from(
+      response,
+    );
+  }
+}

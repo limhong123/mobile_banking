@@ -6,9 +6,10 @@ import {
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 
-export default function AdminLayout() {
+export default function MainLayout() {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const [sidebarOpen, setSidebarOpen] =
     useState(false);
 
@@ -65,3 +66,4 @@ export default function AdminLayout() {
     </div>
   );
 }
+

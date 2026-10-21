@@ -8,83 +8,52 @@ class Config {
   Config._() {
     dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (
-          RequestOptions options,
-          RequestInterceptorHandler handler,
-        ) {
-          final String? token =
-              box.read<String>('token');
+        onRequest: (RequestOptions options, RequestInterceptorHandler handler) {
+          final String? token = box.read<String>('token');
 
-          final bool alreadyHasAuthorization =
-              options.headers.containsKey(
+          final bool alreadyHasAuthorization = options.headers.containsKey(
             'Authorization',
           );
 
           if (!alreadyHasAuthorization &&
               token != null &&
               token.trim().isNotEmpty) {
-            options.headers['Authorization'] =
-                'Bearer ${token.trim()}';
+            options.headers['Authorization'] = 'Bearer ${token.trim()}';
           }
 
           if (kDebugMode) {
-            debugPrint(
-              'REQUEST: ${options.method} ${options.uri}',
-            );
+            debugPrint('REQUEST: ${options.method} ${options.uri}');
 
-            debugPrint(
-              'HEADERS: ${options.headers}',
-            );
+            debugPrint('HEADERS: ${options.headers}');
 
-            debugPrint(
-              'DATA: ${options.data}',
-            );
+            debugPrint('DATA: ${options.data}');
           }
 
           handler.next(options);
         },
 
-        onResponse: (
-          Response<dynamic> response,
-          ResponseInterceptorHandler handler,
-        ) {
+        onResponse:
+            (Response<dynamic> response, ResponseInterceptorHandler handler) {
+              if (kDebugMode) {
+                debugPrint('STATUS: ${response.statusCode}');
+
+                debugPrint('RESPONSE: ${response.data}');
+              }
+
+              handler.next(response);
+            },
+
+        onError: (DioException error, ErrorInterceptorHandler handler) {
           if (kDebugMode) {
-            debugPrint(
-              'STATUS: ${response.statusCode}',
-            );
+            debugPrint('DIO STATUS: ${error.response?.statusCode}');
 
-            debugPrint(
-              'RESPONSE: ${response.data}',
-            );
-          }
+            debugPrint('DIO ERROR: ${error.response?.data}');
 
-          handler.next(response);
-        },
+            debugPrint('DIO MESSAGE: ${error.message}');
 
-        onError: (
-          DioException error,
-          ErrorInterceptorHandler handler,
-        ) {
-          if (kDebugMode) {
-            debugPrint(
-              'DIO STATUS: ${error.response?.statusCode}',
-            );
+            debugPrint('DIO TYPE: ${error.type}');
 
-            debugPrint(
-              'DIO ERROR: ${error.response?.data}',
-            );
-
-            debugPrint(
-              'DIO MESSAGE: ${error.message}',
-            );
-
-            debugPrint(
-              'DIO TYPE: ${error.type}',
-            );
-
-            debugPrint(
-              'REQUEST URL: ${error.requestOptions.uri}',
-            );
+            debugPrint('REQUEST URL: ${error.requestOptions.uri}');
           }
 
           handler.next(error);
@@ -93,13 +62,11 @@ class Config {
     );
   }
 
-  static final Config instance =
-      Config._();
+  static final Config instance = Config._();
 
-  final GetStorage box =
-      GetStorage();
+  final GetStorage box = GetStorage();
 
-  static const String computerIp = '192.168.1.25';
+  static const String computerIp = '192.168.100.138';
 
   String get baseUrl {
     if (kIsWeb) {
@@ -116,46 +83,30 @@ class Config {
   late final Dio dio = Dio(
     BaseOptions(
       baseUrl: baseUrl,
-      connectTimeout:
-          const Duration(seconds: 30),
-      receiveTimeout:
-          const Duration(seconds: 60),
-      sendTimeout:
-          const Duration(seconds: 60),
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 60),
+      sendTimeout: const Duration(seconds: 60),
       headers: {
         'Accept': 'application/json',
-        'Content-Type':
-            'application/json',
       },
     ),
   );
 
-  Future<void> saveToken(
-    String token,
-  ) async {
-    await box.write(
-      'token',
-      token.trim(),
-    );
+  Future<void> saveToken(String token) async {
+    await box.write('token', token.trim());
   }
 
   String? getToken() {
-    return box.read<String>(
-      'token',
-    );
+    return box.read<String>('token');
   }
 
   Future<void> removeToken() async {
-    await box.remove(
-      'token',
-    );
+    await box.remove('token');
   }
 
   bool get hasToken {
-    final String? token =
-        getToken();
+    final String? token = getToken();
 
-    return token != null &&
-        token.trim().isNotEmpty;
+    return token != null && token.trim().isNotEmpty;
   }
 }

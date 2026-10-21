@@ -665,6 +665,9 @@ class LivenessController
 
             'match_score':
                 matchScore,
+
+            'nid_data':
+                response['nid_data'],
           },
         );
 

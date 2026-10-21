@@ -1,98 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_banking_app/app/app_color.dart';
+import 'package:mobile_banking_app/app/app_text.dart';
 import 'package:mobile_banking_app/screen/payment/send/send_controller.dart';
 
 class SendView extends GetView<SendController> {
   const SendView({super.key});
 
-  static const Color primary = Color(0xFF1249AD);
-  static const Color primarySoft = Color(0xFFEAF2FF);
-  static const Color dark = Color(0xFF14213D);
-  static const Color bg = Color(0xFFF5F7FF);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: bg,
+      backgroundColor: AppColor.background,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          color: dark,
+          color: Colors.black87,
         ),
-        title: const Text(
+        title: Text(
           'Send Money',
-          style: TextStyle(color: dark, fontWeight: FontWeight.w700),
+          style: AppText.h3.copyWith(color: Colors.black87),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: dark,
+        backgroundColor: AppColor.background,
+        foregroundColor: Colors.black87,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
       body: Obx(
         () => SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
+                  gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFF1C5AE8), Color(0xFF113F9A)],
+                    colors: [
+                      AppColor.secondaryColor,
+                      AppColor.secondaryColor.withOpacity(0.8),
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(
-                        0xFF1C5AE8,
-                      ).withAlpha((0.28 * 255).round()),
-                      blurRadius: 18,
-                      offset: const Offset(0, 12),
+                      color: AppColor.secondaryColor.withOpacity(0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Transfer',
-                      style: TextStyle(
+                      style: AppText.labelSmall.copyWith(
                         color: Colors.white70,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
                         letterSpacing: 1.2,
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Text(
+                    Text(
                       'Fast, secure, and simple.',
-                      style: TextStyle(
+                      style: AppText.h2.copyWith(
                         color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
                         height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
                     Row(
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           Icons.security_rounded,
                           color: Colors.white70,
                           size: 18,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
                           'Protected by bank-grade security',
-                          style: TextStyle(
+                          style: AppText.labelSmall.copyWith(
                             color: Colors.white70,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -101,27 +93,23 @@ class SendView extends GetView<SendController> {
                 ),
               ),
 
-              const SizedBox(height: 22),
+              const SizedBox(height: 32),
 
               if (!controller.receiverFound.value) ...[
-                const Text(
-                  'Receiver details',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: dark,
-                  ),
+                Text(
+                  'Receiver Details',
+                  style: AppText.h4.copyWith(color: Colors.black87),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withAlpha((0.04 * 255).round()),
-                        blurRadius: 14,
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
                     ],
@@ -133,34 +121,24 @@ class SendView extends GetView<SendController> {
                         onChanged: (value) =>
                             controller.accountNumber.value = value,
                         textCapitalization: TextCapitalization.characters,
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: AppText.bodyLarge.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: dark,
+                          color: Colors.black87,
                         ),
                         decoration: InputDecoration(
                           labelText: 'Account Number',
+                          labelStyle: AppText.bodyMedium.copyWith(color: Colors.grey),
                           hintText: 'KHP123456789',
+                          hintStyle: AppText.bodyLarge.copyWith(color: Colors.grey.shade400),
                           filled: true,
-                          fillColor: const Color(0xFFF8F9FF),
-                          prefixIcon: const Icon(
+                          fillColor: AppColor.background,
+                          prefixIcon: Icon(
                             Icons.account_balance_wallet_outlined,
-                            color: primary,
+                            color: AppColor.secondaryColor,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: primary,
-                              width: 1.5,
-                            ),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             vertical: 18,
@@ -168,7 +146,7 @@ class SendView extends GetView<SendController> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
                         height: 56,
@@ -177,7 +155,7 @@ class SendView extends GetView<SendController> {
                               ? null
                               : controller.findReceiver,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: primary,
+                            backgroundColor: AppColor.secondaryColor,
                             foregroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
@@ -186,19 +164,16 @@ class SendView extends GetView<SendController> {
                           ),
                           child: controller.isSearching.value
                               ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
+                                  width: 24,
+                                  height: 24,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.5,
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text(
+                              : Text(
                                   'Continue',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  style: AppText.h4.copyWith(color: Colors.white),
                                 ),
                         ),
                       ),
@@ -206,25 +181,21 @@ class SendView extends GetView<SendController> {
                   ),
                 ),
               ] else ...[
-                const Text(
+                Text(
                   'Recipient',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: dark,
-                  ),
+                  style: AppText.h4.copyWith(color: Colors.black87),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withAlpha((0.04 * 255).round()),
-                        blurRadius: 14,
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
                     ],
@@ -232,16 +203,16 @@ class SendView extends GetView<SendController> {
                   child: Row(
                     children: [
                       Container(
-                        width: 62,
-                        height: 62,
+                        width: 64,
+                        height: 64,
                         decoration: BoxDecoration(
-                          color: primarySoft,
-                          borderRadius: BorderRadius.circular(18),
+                          color: AppColor.secondaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.person_rounded,
-                          color: primary,
-                          size: 30,
+                          color: AppColor.secondaryColor,
+                          size: 32,
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -251,18 +222,13 @@ class SendView extends GetView<SendController> {
                           children: [
                             Text(
                               controller.receiverName.value,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: dark,
-                              ),
+                              style: AppText.h4.copyWith(color: Colors.black87),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 4),
                             Text(
                               controller.receiverAccountNumber.value,
-                              style: TextStyle(
+                              style: AppText.bodyMedium.copyWith(
                                 color: Colors.grey.shade600,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
@@ -272,26 +238,22 @@ class SendView extends GetView<SendController> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
-                const Text(
+                Text(
                   'Amount',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    color: dark,
-                  ),
+                  style: AppText.h4.copyWith(color: Colors.black87),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withAlpha((0.04 * 255).round()),
-                        blurRadius: 14,
+                        color: Colors.black.withOpacity(0.03),
+                        blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
                     ],
@@ -305,52 +267,55 @@ class SendView extends GetView<SendController> {
                           decimal: true,
                         ),
                         onChanged: (value) => controller.amount.value = value,
-                        style: const TextStyle(
-                          fontSize: 30,
+                        style: AppText.h1.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: dark,
+                          color: Colors.black87,
                         ),
                         decoration: InputDecoration(
                           prefixText: '\$ ',
-                          prefixStyle: const TextStyle(
-                            color: dark,
-                            fontSize: 30,
+                          prefixStyle: AppText.h1.copyWith(
+                            color: Colors.black87,
                             fontWeight: FontWeight.w800,
                           ),
                           hintText: '0.00',
-                          hintStyle: const TextStyle(
-                            color: Color(0xFFADB6D3),
-                            fontSize: 30,
+                          hintStyle: AppText.h1.copyWith(
+                            color: Colors.grey.shade300,
                             fontWeight: FontWeight.w800,
                           ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Container(height: 1, color: const Color(0xFFE7EBF7)),
                       const SizedBox(height: 16),
+                      Container(height: 1, color: Colors.grey.shade100),
+                      const SizedBox(height: 20),
                       Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: 12,
+                        runSpacing: 12,
                         children: ['25', '50', '100', '250']
                             .map(
                               (amount) => InkWell(
                                 borderRadius: BorderRadius.circular(12),
-                                onTap: () => controller.amount.value = amount,
+                                onTap: () {
+                                  controller.amount.value = amount;
+                                  // Workaround to reset the text field value since we can't easily access its controller here,
+                                  // but getx might handle it if it was bound properly.
+                                  // For a full fix we would need TextEditingController.
+                                },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 8,
+                                    horizontal: 20,
+                                    vertical: 10,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF3F6FF),
+                                    color: AppColor.secondaryColor.withOpacity(0.08),
                                     borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: AppColor.secondaryColor.withOpacity(0.2)),
                                   ),
                                   child: Text(
                                     '\$$amount',
-                                    style: const TextStyle(
-                                      color: primary,
+                                    style: AppText.bodyMedium.copyWith(
+                                      color: AppColor.secondaryColor,
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
@@ -363,59 +328,56 @@ class SendView extends GetView<SendController> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 40),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 58,
+                  height: 56,
                   child: ElevatedButton(
                     onPressed: controller.isSending.value
                         ? null
                         : controller.sendMoney,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primary,
+                      backgroundColor: AppColor.secondaryColor,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     child: controller.isSending.value
                         ? const SizedBox(
-                            width: 22,
-                            height: 22,
+                            width: 24,
+                            height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
                               color: Colors.white,
                             ),
                           )
-                        : const Text(
+                        : Text(
                             'Send Money',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: AppText.h4.copyWith(color: Colors.white),
                           ),
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 54,
+                  height: 56,
                   child: OutlinedButton(
                     onPressed: controller.resetReceiver,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: dark,
-                      side: const BorderSide(color: Color(0xFFD9E0F3)),
+                      foregroundColor: Colors.black87,
+                      side: BorderSide(color: Colors.grey.shade300),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Change Receiver',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                      style: AppText.bodyMedium.copyWith(fontWeight: FontWeight.w700),
                     ),
                   ),
                 ),

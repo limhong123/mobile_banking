@@ -14,39 +14,34 @@ class HomeView extends GetView<HomeViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  Get.toNamed(AppRoutes.transactionHistory);
-                },
-                icon: Icon(Icons.notifications, size: 28),
-              ),
-              IconButton(
-                onPressed: () {
-                  Get.toNamed(AppRoutes.myQr);
-                },
-                icon: Icon(Icons.qr_code_2_rounded, size: 28),
-              ),
-            ],
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(
-            children: [
-              _HeaderAccount(),
-              SizedBox(height: 16),
-              _CardBill(),
-              SizedBox(height: 30),
-              _GridMenu(),
-              SizedBox(height: 20),
-              _Slider(),
-            ],
+      backgroundColor: AppColor.scaffoldBackground,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _HeaderAccount(),
+                const SizedBox(height: 24),
+                _CardBill(),
+                const SizedBox(height: 32),
+                Text(
+                  'Services',
+                  style: AppText.h3.copyWith(fontWeight: FontWeight.bold, color: AppColor.textPrimary),
+                ),
+                const SizedBox(height: 16),
+                _GridMenu(),
+                const SizedBox(height: 32),
+                Text(
+                  'Promotions',
+                  style: AppText.h3.copyWith(fontWeight: FontWeight.bold, color: AppColor.textPrimary),
+                ),
+                const SizedBox(height: 16),
+                _Slider(),
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),
@@ -55,19 +50,19 @@ class HomeView extends GetView<HomeViewController> {
 
   Widget _Slider() {
     return Stack(
-      clipBehavior: Clip.none,
       children: [
         Container(
-          height: 180,
+          height: 160,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: AppColor.secondaryColor,
             borderRadius: BorderRadius.circular(20),
+           color: AppColor.primaryColor
           ),
           child: CarouselSlider(
             options: CarouselOptions(
               autoPlay: true,
-              autoPlayInterval: Duration(seconds: 1),
+              viewportFraction: 1.0,
+              autoPlayInterval: const Duration(seconds: 4),
               onPageChanged: (index, reason) {
                 controller.onPageChanged(index);
               },
@@ -75,31 +70,32 @@ class HomeView extends GetView<HomeViewController> {
             items: controller.images.map((path) {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: Image.asset(path, fit: BoxFit.cover),
+                child: Image.asset(
+                  path,
+                  
+                  width: double.infinity,
+                ),
               );
             }).toList(),
           ),
         ),
         Positioned(
-          bottom: 0,
+          bottom: 12,
           right: 0,
           left: 0,
           child: Obx(
             () => Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: controller.images.asMap().entries.map((entry) {
-                return Container(
-                  width: controller.current == entry.key ? 12 : 8,
+                bool isActive = controller.current.value == entry.key;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: isActive ? 24 : 8,
                   height: 8.0,
-                  margin: const EdgeInsets.symmetric(
-                    vertical: 10.0,
-                    horizontal: 4.0,
-                  ),
+                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: controller.current == entry.key
-                        ? Colors.white
-                        : Colors.white54,
+                    borderRadius: BorderRadius.circular(4.0),
+                    color: isActive ? AppColor.secondaryColor : AppColor.white.withOpacity(0.6),
                   ),
                 );
               }).toList(),
@@ -112,21 +108,60 @@ class HomeView extends GetView<HomeViewController> {
 
   Widget _HeaderAccount() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        CircleAvatar(radius: 26, child: Icon(Icons.person, size: 30)),
-        SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            Obx(
-              () => Text(
-                controller.user.value?.fullName ?? '',
-                style: AppText.h4.copyWith(color: AppColor.secondaryColor),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColor.primaryColor, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColor.primaryColor.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const CircleAvatar(
+                radius: 24, 
+                backgroundColor: AppColor.white,
+                child: Icon(Icons.person, size: 28, color: AppColor.primaryColor),
               ),
             ),
-            Text(
-              'Good Morning',
-              style: AppText.bodySmall.copyWith(color: AppColor.secondaryColor),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Good Morning,',
+                  style: AppText.bodySmall.copyWith(color: AppColor.textSecondary),
+                ),
+                const SizedBox(height: 2),
+                Obx(
+                  () => Text(
+                    controller.user.value?.fullName ?? 'Welcome!',
+                    style: AppText.h4.copyWith(
+                      color: AppColor.primaryColor, 
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            _actionButton(
+              icon: Icons.qr_code_scanner_rounded,
+              onTap: () => Get.toNamed(AppRoutes.myQr),
+            ),
+            const SizedBox(width: 12),
+            _actionButton(
+              icon: Icons.notifications_none_rounded,
+              onTap: () => Get.toNamed(AppRoutes.transactionHistory),
             ),
           ],
         ),
@@ -134,174 +169,221 @@ class HomeView extends GetView<HomeViewController> {
     );
   }
 
-  // home_view.dart
-Widget _GridMenu() {
-  return Obx(() => ReorderableGridView.builder(
-    shrinkWrap: true,
-    physics: NeverScrollableScrollPhysics(),
-    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 3,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 1,
-    ),
-    itemCount: controller.menuItems.length,
-    onReorder: controller.onReorder,
-    dragStartBehavior: DragStartBehavior.start, // ចាប់ផ្តើមអូសពេលចុចជាប់ (long press)
-    itemBuilder: (context, index) {
-  final item = controller.menuItems[index];
-  return ClipRRect(
-    key: ValueKey(item['route']), // key moves to the outermost widget
-    borderRadius: BorderRadius.circular(12),
-    child: Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => controller.onLockedMenuTap(item['route']),
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: EdgeInsets.all(12),
+  Widget _actionButton({required IconData icon, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppColor.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColor.shadow,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Icon(icon, size: 24, color: AppColor.primaryColor),
+      ),
+    );
+  }
+
+  Widget _GridMenu() {
+    return Obx(() => ReorderableGridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.9,
+      ),
+      itemCount: controller.menuItems.length,
+      onReorder: controller.onReorder,
+      dragStartBehavior: DragStartBehavior.start,
+      itemBuilder: (context, index) {
+        final item = controller.menuItems[index];
+        return Container(
+          key: ValueKey(item['route']),
           decoration: BoxDecoration(
-            color: AppColor.secondaryColor.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColor.secondaryColor.withOpacity(0.15),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(item['icon'], color: AppColor.secondaryColor, size: 22),
+            color: AppColor.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppColor.shadow,
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              SizedBox(height: 8),
-              Text(item['label'], style: AppText.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
             ],
           ),
-        ),
-      ),
-    ),
-  );
-},
-  ));
-}
+          child: Material(
+            color: AppColor.transparent,
+            child: InkWell(
+              onTap: () => controller.onLockedMenuTap(item['route']),
+              borderRadius: BorderRadius.circular(20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColor.primaryColor.withOpacity(0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(item['icon'], color: AppColor.primaryColor, size: 26),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    item['label'], 
+                    style: AppText.labelMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColor.textPrimary,
+                    ), 
+                    maxLines: 1, 
+                    overflow: TextOverflow.ellipsis
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    ));
+  }
 
   Widget _CardBill() {
     return Container(
-      padding: EdgeInsets.all(20),
       width: double.infinity,
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
           colors: [
-            AppColor.secondaryColor,
-            AppColor.secondaryColor.withOpacity(0.75),
+            AppColor.primaryColor,
+            AppColor.primaryColor.withOpacity(0.85),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColor.secondaryColor.withOpacity(0.35),
-            blurRadius: 16,
-            offset: Offset(0, 8),
+            color: AppColor.primaryColor.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Today Bill',
-                style: AppText.h3.copyWith(color: Colors.white),
-              ),
-              Text(
-                controller.currentDate,
-                style: AppText.bodySmall.copyWith(color: Colors.white70),
-              ),
-            ],
+          // Background abstract shapes
+          Positioned(
+            right: -20,
+            top: -20,
+            child: CircleAvatar(
+              radius: 70,
+              backgroundColor: AppColor.white.withOpacity(0.08),
+            ),
           ),
-          SizedBox(height: 20),
-          IntrinsicHeight(
-            child: Row(
+          Positioned(
+            right: 60,
+            bottom: -30,
+            child: CircleAvatar(
+              radius: 50,
+              backgroundColor: AppColor.white.withOpacity(0.08),
+            ),
+          ),
+          Positioned(
+            left: -20,
+            bottom: -20,
+            child: CircleAvatar(
+              radius: 60,
+              backgroundColor: AppColor.white.withOpacity(0.05),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Balance
-                Expanded(
-                  child: Obx(
-                    () => _AmountBlock(
-                      icon: Icons.account_balance_rounded,
-                      iconBg: Colors.white.withOpacity(0.2),
-                      iconColor: Colors.white,
-                      label: 'Balance',
-                      amount:
-                          '\$ ${controller.balance.value.toStringAsFixed(2)}',
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Available Balance',
+                      style: AppText.bodyMedium.copyWith(color: AppColor.white.withOpacity(0.85)),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColor.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.calendar_today_rounded, size: 14, color: AppColor.white),
+                          const SizedBox(width: 6),
+                          Text(
+                            controller.currentDate,
+                            style: AppText.bodySmall.copyWith(color: AppColor.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Obx(
+                  () => Text(
+                    '\$ ${controller.balance.value.toStringAsFixed(2)}',
+                    style: AppText.h1.copyWith(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.white,
+                      letterSpacing: 1,
                     ),
                   ),
                 ),
-                // Divider
-                Container(
-                  width: 1,
-                  margin: EdgeInsets.symmetric(horizontal: 12),
-                  color: Colors.white.withOpacity(0.3),
-                ),
-                // Transaction
-                Expanded(
-                  child: Obx(
-                    () => _AmountBlock(
-                      icon: Icons.trending_down_rounded,
-                      iconBg: Colors.white.withOpacity(0.2),
-                      iconColor: Colors.redAccent.shade100,
-                      label: 'Expense',
-                      amount:
-                          '- \$ ${controller.expense.value.toStringAsFixed(2)}',
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Total Expense',
+                          style: AppText.bodySmall.copyWith(color: AppColor.white.withOpacity(0.85)),
+                        ),
+                        const SizedBox(height: 6),
+                        Obx(
+                          () => Text(
+                            '- \$ ${controller.expense.value.toStringAsFixed(2)}',
+                            style: AppText.h4.copyWith(
+                              color: AppColor.red,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColor.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.trending_down_rounded, color: AppColor.white, size: 20),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _AmountBlock({
-    required IconData icon,
-    required Color iconBg,
-    required Color iconColor,
-    required String label,
-    required String amount,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(6),
-              decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-              child: Icon(icon, color: iconColor, size: 18),
-            ),
-            SizedBox(width: 8),
-            Text(
-              label,
-              style: AppText.bodySmall.copyWith(color: Colors.white70),
-            ),
-          ],
-        ),
-        SizedBox(height: 6),
-        Text(
-          amount,
-          style: AppText.h4.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
     );
   }
 }
