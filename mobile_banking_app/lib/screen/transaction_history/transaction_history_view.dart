@@ -13,17 +13,17 @@ class TransactionHistoryView extends GetView<TransactionHistoryController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.background,
+      backgroundColor: AppColor.scaffoldBackground,
       appBar: AppBar(
-        backgroundColor: AppColor.background,
+        backgroundColor: AppColor.scaffoldBackground,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColor.textPrimary),
           onPressed: () => Get.back(),
         ),
         title: Text(
           'Transaction History',
-          style: AppText.h3.copyWith(color: Colors.black87),
+          style: AppText.h3.copyWith(color: AppColor.textPrimary),
         ),
         centerTitle: true,
       ),
@@ -39,12 +39,12 @@ class TransactionHistoryView extends GetView<TransactionHistoryController> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
+                const Icon(Icons.error_outline_rounded, color: AppColor.red, size: 48),
                 const SizedBox(height: 16),
                 Text(
                   controller.errorMessage.value,
                   textAlign: TextAlign.center,
-                  style: AppText.bodyMedium.copyWith(color: Colors.black87),
+                  style: AppText.bodyMedium.copyWith(color: AppColor.textPrimary),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -54,7 +54,7 @@ class TransactionHistoryView extends GetView<TransactionHistoryController> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   ),
-                  child: Text('Try Again', style: AppText.bodyMedium.copyWith(color: Colors.white)),
+                  child: Text('Try Again', style: AppText.bodyMedium.copyWith(color: AppColor.white)),
                 ),
               ],
             ),
@@ -66,11 +66,11 @@ class TransactionHistoryView extends GetView<TransactionHistoryController> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.receipt_long_rounded, color: Colors.grey[400], size: 64),
+                const Icon(Icons.receipt_long_rounded, color: AppColor.textHint, size: 64),
                 const SizedBox(height: 16),
                 Text(
                   'No transactions yet',
-                  style: AppText.h4.copyWith(color: Colors.grey[600]),
+                  style: AppText.h4.copyWith(color: AppColor.textSecondary),
                 ),
               ],
             ),
@@ -107,7 +107,7 @@ class _TransactionItem extends StatelessWidget {
         ? ''
         : DateFormat('MMM dd, yyyy • hh:mm a').format(transaction.createdAt!.toLocal());
 
-    String title = transaction.counterpartyName ?? '';
+    String title = transaction.counterpartyName;
     if (transaction.isDeposit) {
       title = 'Cash Deposit';
     }
@@ -117,18 +117,18 @@ class _TransactionItem extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColor.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: AppColor.shadow,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Material(
-        color: Colors.transparent,
+        color: AppColor.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
@@ -141,12 +141,12 @@ class _TransactionItem extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: incoming ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                    color: incoming ? AppColor.primaryColor.withValues(alpha: 0.1) : AppColor.red.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     incoming ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
-                    color: incoming ? Colors.green : Colors.redAccent,
+                    color: incoming ? AppColor.primaryColor : AppColor.red,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -158,7 +158,7 @@ class _TransactionItem extends StatelessWidget {
                         title,
                         style: AppText.bodyMedium.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: Colors.black87,
+                          color: AppColor.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -166,7 +166,7 @@ class _TransactionItem extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         date,
-                        style: AppText.labelSmall.copyWith(color: Colors.grey[500]),
+                        style: AppText.labelSmall.copyWith(color: AppColor.textSecondary),
                       ),
                     ],
                   ),
@@ -178,7 +178,7 @@ class _TransactionItem extends StatelessWidget {
                       '${incoming ? '+' : '-'}\$${transaction.amount.toStringAsFixed(2)}',
                       style: AppText.bodyLarge.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: incoming ? Colors.green : Colors.black87,
+                        color: incoming ? AppColor.primaryColor : AppColor.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -186,7 +186,7 @@ class _TransactionItem extends StatelessWidget {
                       transaction.status.toUpperCase(),
                       style: AppText.labelSmall.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: transaction.isSuccess ? Colors.green : Colors.orange,
+                        color: transaction.isSuccess ? AppColor.primaryColor : AppColor.textSecondary,
                       ),
                     ),
                   ],

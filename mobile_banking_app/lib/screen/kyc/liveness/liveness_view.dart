@@ -1,9 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:mobile_banking_app/app/app_color.dart';
+import 'package:mobile_banking_app/app/app_text.dart';
 import 'package:mobile_banking_app/screen/kyc/liveness/liveness_controller.dart';
-
 
 class LivenessView
     extends GetView<LivenessController> {
@@ -11,51 +11,30 @@ class LivenessView
     super.key,
   });
 
-
   static const Color primaryColor =
-      Color(
-    0xFF1249AD,
-  );
-
+      AppColor.secondaryColor;
 
   static const Color secondaryColor =
-      Color(
-    0xFF7AC40B,
-  );
-
+      AppColor.primaryColor;
 
   @override
   Widget build(
     BuildContext context,
   ) {
     return Scaffold(
-      backgroundColor:
-          const Color(
-        0xFFF7F9FD,
-      ),
-
+      backgroundColor: AppColor.scaffoldBackground,
       appBar: AppBar(
-        title:
-            const Text(
+        title: Text(
           'Face Verification',
-
-          style:
-              TextStyle(
-            fontWeight:
-                FontWeight.w700,
+          style: AppText.h4.copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppColor.textPrimary,
           ),
         ),
-
-        centerTitle:
-            true,
-
-        backgroundColor:
-            Colors.white,
-
-        surfaceTintColor:
-            Colors.white,
+        centerTitle: true,
+        backgroundColor: AppColor.white,
+        surfaceTintColor: AppColor.white,
       ),
-
 
       body: SafeArea(
         child: Obx(
@@ -213,8 +192,7 @@ class LivenessView
                                     BoxDecoration(
                                   color:
                                       Colors.black
-                                          .withOpacity(
-                                    0.45,
+                                          .withValues(alpha: 0.45,
                                   ),
 
                                   borderRadius:

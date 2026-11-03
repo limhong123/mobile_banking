@@ -19,7 +19,7 @@ class PinView extends GetView<PinController> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColor.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -40,8 +40,8 @@ class PinView extends GetView<PinController> {
                       child: Container(
                         width: 52,
                         height: 52,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade100,
+                        decoration: const BoxDecoration(
+                          color: AppColor.background,
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
@@ -52,7 +52,7 @@ class PinView extends GetView<PinController> {
                           icon: const Icon(
                             Icons.close,
                             size: 30,
-                            color: Colors.black,
+                            color: AppColor.textPrimary,
                           ),
                         ),
                       ),
@@ -67,8 +67,8 @@ class PinView extends GetView<PinController> {
                         ? 'បញ្ចូលលេខសម្ងាត់'
                         : 'បង្កើតលេខសម្ងាត់',
                     style: AppText.h1.copyWith(
-                      color: AppColor.secondaryColor.withOpacity(0.6),
-                      
+                      color: AppColor.secondaryColor,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
 
@@ -78,8 +78,8 @@ class PinView extends GetView<PinController> {
                   Container(
                     width: 82,
                     height: 82,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                    decoration: const BoxDecoration(
+                      color: AppColor.background,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -98,7 +98,7 @@ class PinView extends GetView<PinController> {
                       vertical: 18,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
+                      color: AppColor.scaffoldBackground,
                       borderRadius: BorderRadius.circular(35),
                     ),
                     child: Obx(
@@ -120,7 +120,7 @@ class PinView extends GetView<PinController> {
                                 shape: BoxShape.circle,
                                 color: selected
                                     ? AppColor.secondaryColor
-                                    : Colors.grey.shade300,
+                                    : AppColor.textHint,
                               ),
                             );
                           },
@@ -140,7 +140,7 @@ class PinView extends GetView<PinController> {
                           snackPosition: SnackPosition.BOTTOM,
                         );
                       },
-                      child:  Text(
+                      child: Text(
                         'ភ្លេចលេខសម្ងាត់?',
                         style: AppText.bodySmall.copyWith(
                           color: AppColor.secondaryColor,
@@ -205,6 +205,7 @@ class PinView extends GetView<PinController> {
                     child: Icon(
                       Icons.backspace_outlined,
                       size: 26,
+                      color: AppColor.textPrimary,
                     ),
                   ),
                 ),
@@ -224,23 +225,22 @@ class PinView extends GetView<PinController> {
         },
         child: Container(
           height: 72,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             border: Border(
               top: BorderSide(
-                color: Colors.grey.shade200,
+                color: AppColor.background,
               ),
               right: BorderSide(
-                color: Colors.grey.shade200,
+                color: AppColor.background,
               ),
             ),
           ),
           child: Center(
             child: Text(
               number,
-              style: const TextStyle(
-                fontSize: 34,
+              style: AppText.h1.copyWith(
                 fontWeight: FontWeight.w400,
-                color: Colors.black,
+                color: AppColor.textPrimary,
               ),
             ),
           ),

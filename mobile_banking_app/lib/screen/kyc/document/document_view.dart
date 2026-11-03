@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:mobile_banking_app/app/app_color.dart';
+import 'package:mobile_banking_app/app/app_text.dart';
 import 'package:mobile_banking_app/screen/kyc/document/document_controller.dart';
-
 
 class DocumentView
     extends GetView<DocumentController> {
@@ -12,37 +12,25 @@ class DocumentView
     super.key,
   });
 
-
   static const Color primaryColor =
-      Color(0xFF1249AD);
-
+      AppColor.secondaryColor;
 
   @override
   Widget build(
     BuildContext context,
   ) {
     return Scaffold(
-      backgroundColor:
-          const Color(
-        0xFFF7F9FD,
-      ),
-
+      backgroundColor: AppColor.scaffoldBackground,
       appBar: AppBar(
-        backgroundColor:
-            Colors.white,
-
-        surfaceTintColor:
-            Colors.white,
-
-        title: const Text(
+        backgroundColor: AppColor.white,
+        surfaceTintColor: AppColor.white,
+        title: Text(
           'Identity Document',
-
-          style: TextStyle(
-            fontWeight:
-                FontWeight.w700,
+          style: AppText.h4.copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppColor.textPrimary,
           ),
         ),
-
         centerTitle: true,
       ),
 
@@ -179,8 +167,7 @@ class DocumentView
                           BoxShadow(
                             color:
                                 Colors.black
-                                    .withOpacity(
-                              0.04,
+                                    .withValues(alpha: 0.04,
                             ),
 
                             blurRadius:
@@ -235,8 +222,7 @@ class DocumentView
                                             BoxDecoration(
                                           color:
                                               Colors.black
-                                                  .withOpacity(
-                                            0.55,
+                                                  .withValues(alpha: 0.55,
                                           ),
 
                                           shape:
@@ -502,8 +488,7 @@ class DocumentView
                 BoxDecoration(
               color:
                   primaryColor
-                      .withOpacity(
-                0.08,
+                      .withValues(alpha: 0.08,
               ),
 
               shape:

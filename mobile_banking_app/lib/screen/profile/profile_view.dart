@@ -17,13 +17,13 @@ class ProfileView extends GetView<ProfileViewController> {
     final homeCtrl = Get.isRegistered<HomeViewController>() ? Get.find<HomeViewController>() : null;
     
     return Scaffold(
-      backgroundColor: AppColor.background,
+      backgroundColor: AppColor.scaffoldBackground,
       appBar: AppBar(
-        backgroundColor: AppColor.background,
+        backgroundColor: AppColor.scaffoldBackground,
         elevation: 0,
         title: Text(
           'Profile',
-          style: AppText.h3.copyWith(color: Colors.black87),
+          style: AppText.h3.copyWith(color: AppColor.textPrimary),
         ),
         centerTitle: true,
       ),
@@ -35,11 +35,11 @@ class ProfileView extends GetView<ProfileViewController> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColor.white,
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: AppColor.shadow,
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -59,15 +59,15 @@ class ProfileView extends GetView<ProfileViewController> {
                           child: homeCtrl == null 
                             ? const CircleAvatar(
                                 radius: 36,
-                                backgroundColor: Colors.white,
-                                child: Icon(Icons.person, size: 40, color: Colors.grey),
+                                backgroundColor: AppColor.white,
+                                child: Icon(Icons.person, size: 40, color: AppColor.textHint),
                               )
                             : Obx(() {
                             final photoPath = homeCtrl.user.value?.profilePhoto;
                             if (photoPath != null && photoPath.isNotEmpty) {
                               return CircleAvatar(
                                 radius: 36,
-                                backgroundColor: Colors.white,
+                                backgroundColor: AppColor.white,
                                 backgroundImage: NetworkImage(
                                   '${Config.instance.baseUrl}/$photoPath',
                                 ),
@@ -75,8 +75,8 @@ class ProfileView extends GetView<ProfileViewController> {
                             }
                             return const CircleAvatar(
                               radius: 36,
-                              backgroundColor: Colors.white,
-                              child: Icon(Icons.person, size: 40, color: Colors.grey),
+                              backgroundColor: AppColor.white,
+                              child: Icon(Icons.person, size: 40, color: AppColor.textHint),
                             );
                           }),
                         ),
@@ -89,7 +89,7 @@ class ProfileView extends GetView<ProfileViewController> {
                               color: AppColor.secondaryColor,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
+                            child: const Icon(Icons.camera_alt, size: 14, color: AppColor.white),
                           ),
                         ),
                       ],
@@ -103,13 +103,13 @@ class ProfileView extends GetView<ProfileViewController> {
                         homeCtrl == null
                           ? Text(
                               'User Name',
-                              style: AppText.h3.copyWith(color: Colors.black87),
+                              style: AppText.h3.copyWith(color: AppColor.textPrimary),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             )
                           : Obx(() => Text(
                               homeCtrl.user.value?.fullName ?? 'User Name',
-                              style: AppText.h3.copyWith(color: Colors.black87),
+                              style: AppText.h3.copyWith(color: AppColor.textPrimary),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             )),
@@ -117,11 +117,11 @@ class ProfileView extends GetView<ProfileViewController> {
                         homeCtrl == null
                           ? Text(
                               '+855 00 000 000',
-                              style: AppText.bodyMedium.copyWith(color: Colors.grey[600]),
+                              style: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
                             )
                           : Obx(() => Text(
                               homeCtrl.user.value?.phoneNumber ?? '+855 00 000 000',
-                              style: AppText.bodyMedium.copyWith(color: Colors.grey[600]),
+                              style: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
                             )),
                       ],
                     ),
@@ -172,21 +172,22 @@ class ProfileView extends GetView<ProfileViewController> {
               child: Obx(() => ElevatedButton(
                 onPressed: controller.isLoading.value ? null : controller.logout,
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.redAccent,
+                  backgroundColor: AppColor.white,
+                  foregroundColor: AppColor.red,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
-                    side: BorderSide(color: Colors.redAccent.shade100, width: 1),
+                    side: const BorderSide(color: AppColor.red, width: 1),
                   ),
                 ),
                 child: controller.isLoading.value 
-                  ? const CircularProgressIndicator(color: Colors.redAccent)
+                  ? const CircularProgressIndicator(color: AppColor.red)
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.logout_rounded),
+                        const Icon(Icons.logout_rounded, color: AppColor.red),
                         const SizedBox(width: 8),
-                        Text('Logout', style: AppText.h4.copyWith(color: Colors.redAccent)),
+                        Text('Logout', style: AppText.h4.copyWith(color: AppColor.red)),
                       ],
                     ),
               )),
@@ -204,31 +205,42 @@ class ProfileView extends GetView<ProfileViewController> {
 
     Get.dialog(
       AlertDialog(
-        title: const Text('Edit Profile'),
+        backgroundColor: AppColor.white,
+        title: Text('Edit Profile', style: AppText.h4.copyWith(color: AppColor.textPrimary)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: firstNameCtrl,
-              decoration: const InputDecoration(labelText: 'First Name'),
+              decoration: InputDecoration(
+                labelText: 'First Name',
+                labelStyle: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: lastNameCtrl,
-              decoration: const InputDecoration(labelText: 'Last Name'),
+              decoration: InputDecoration(
+                labelText: 'Last Name',
+                labelStyle: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
+              ),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: AppText.bodyMedium.copyWith(color: AppColor.textSecondary)),
           ),
           ElevatedButton(
             onPressed: () {
               controller.updateProfileInfo(firstNameCtrl.text, lastNameCtrl.text);
             },
-            child: const Text('Save'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColor.secondaryColor,
+              foregroundColor: AppColor.white,
+            ),
+            child: Text('Save', style: AppText.bodyMedium.copyWith(color: AppColor.white)),
           ),
         ],
       )
@@ -252,7 +264,7 @@ class ProfileView extends GetView<ProfileViewController> {
           maxHeight: MediaQuery.of(context).size.height * 0.88,
         ),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColor.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -266,7 +278,7 @@ class ProfileView extends GetView<ProfileViewController> {
                   width: 44,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: AppColor.textHint,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -280,11 +292,11 @@ class ProfileView extends GetView<ProfileViewController> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1249AD).withOpacity(0.1),
+                          color: AppColor.secondaryColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.badge_outlined,
-                            color: Color(0xFF1249AD), size: 24),
+                            color: AppColor.secondaryColor, size: 24),
                       ),
                       const SizedBox(width: 14),
                       Column(
@@ -293,13 +305,14 @@ class ProfileView extends GetView<ProfileViewController> {
                           Text(
                             'Identity Information',
                             style: AppText.h3.copyWith(
-                                color: Colors.black87, fontSize: 18),
+                                color: AppColor.textPrimary, fontSize: 18),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             'National ID & Verification Details',
-                            style: TextStyle(
-                                color: Colors.grey.shade500, fontSize: 12),
+                            style: AppText.labelSmall.copyWith(
+                              color: AppColor.textSecondary,
+                            ),
                           ),
                         ],
                       ),
@@ -307,7 +320,7 @@ class ProfileView extends GetView<ProfileViewController> {
                   ),
                   IconButton(
                     onPressed: () => Get.back(),
-                    icon: const Icon(Icons.close_rounded, color: Colors.grey),
+                    icon: const Icon(Icons.close_rounded, color: AppColor.textSecondary),
                   ),
                 ],
               ),
@@ -318,13 +331,13 @@ class ProfileView extends GetView<ProfileViewController> {
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: isApproved
-                      ? const Color(0xFFE8F5E9)
-                      : const Color(0xFFFFF3E0),
+                      ? AppColor.primaryColor.withValues(alpha: 0.1)
+                      : AppColor.red.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: isApproved
-                        ? const Color(0xFF81C784)
-                        : const Color(0xFFFFB74D),
+                        ? AppColor.primaryColor.withValues(alpha: 0.4)
+                        : AppColor.red.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -334,8 +347,8 @@ class ProfileView extends GetView<ProfileViewController> {
                           ? Icons.verified_rounded
                           : Icons.pending_actions_rounded,
                       color: isApproved
-                          ? const Color(0xFF2E7D32)
-                          : const Color(0xFFE65100),
+                          ? AppColor.primaryColor
+                          : AppColor.red,
                       size: 24,
                     ),
                     const SizedBox(width: 12),
@@ -347,12 +360,11 @@ class ProfileView extends GetView<ProfileViewController> {
                             isApproved
                                 ? 'Identity Verified'
                                 : 'Verification Required',
-                            style: TextStyle(
+                            style: AppText.bodyMedium.copyWith(
                               color: isApproved
-                                  ? const Color(0xFF2E7D32)
-                                  : const Color(0xFFE65100),
+                                  ? AppColor.primaryColor
+                                  : AppColor.red,
                               fontWeight: FontWeight.w700,
-                              fontSize: 14,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -360,11 +372,8 @@ class ProfileView extends GetView<ProfileViewController> {
                             isApproved
                                 ? 'Your National ID has been scanned and biometrically verified.'
                                 : 'Please complete your NID scan and face verification.',
-                            style: TextStyle(
-                              color: isApproved
-                                  ? const Color(0xFF388E3C)
-                                  : const Color(0xFFEF6C00),
-                              fontSize: 12,
+                            style: AppText.bodySmall.copyWith(
+                              color: AppColor.textSecondary,
                             ),
                           ),
                         ],
@@ -378,7 +387,7 @@ class ProfileView extends GetView<ProfileViewController> {
               if (nidFront != null && nidFront.isNotEmpty) ...[
                 Text('Document Photo',
                     style: AppText.h4.copyWith(
-                        color: Colors.grey.shade700, fontSize: 14)),
+                        color: AppColor.textSecondary, fontSize: 14)),
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
@@ -386,16 +395,16 @@ class ProfileView extends GetView<ProfileViewController> {
                     width: double.infinity,
                     height: 170,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      border: Border.all(color: Colors.grey.shade300),
+                      color: AppColor.background,
+                      border: Border.all(color: AppColor.textHint),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Image.network(
                       '${Config.instance.baseUrl}/$nidFront',
                       fit: BoxFit.cover,
-                      errorBuilder: (ctx, err, stack) => Center(
+                      errorBuilder: (ctx, err, stack) => const Center(
                         child: Icon(Icons.broken_image_outlined,
-                            size: 40, color: Colors.grey.shade400),
+                            size: 40, color: AppColor.textHint),
                       ),
                     ),
                   ),
@@ -405,7 +414,7 @@ class ProfileView extends GetView<ProfileViewController> {
               // Info Fields
               Text('National ID Details',
                   style: AppText.h4.copyWith(
-                      color: Colors.grey.shade700, fontSize: 14)),
+                      color: AppColor.textSecondary, fontSize: 14)),
               const SizedBox(height: 10),
               _buildIdentityTile(
                   Icons.numbers_rounded,
@@ -444,8 +453,8 @@ class ProfileView extends GetView<ProfileViewController> {
                     icon: const Icon(Icons.document_scanner_rounded),
                     label: const Text('Verify Identity with NID'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1249AD),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColor.secondaryColor,
+                      foregroundColor: AppColor.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14)),
                     ),
@@ -465,28 +474,25 @@ class ProfileView extends GetView<ProfileViewController> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: AppColor.scaffoldBackground,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColor.background),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: const Color(0xFF1249AD)),
+          Icon(icon, size: 20, color: AppColor.secondaryColor),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500)),
+                    style: AppText.labelSmall.copyWith(
+                        color: AppColor.textSecondary)),
                 const SizedBox(height: 2),
                 Text(value,
-                    style: const TextStyle(
-                        color: Colors.black87,
-                        fontSize: 14,
+                    style: AppText.bodyMedium.copyWith(
+                        color: AppColor.textPrimary,
                         fontWeight: FontWeight.w600)),
               ],
             ),
@@ -504,16 +510,16 @@ class ProfileView extends GetView<ProfileViewController> {
           padding: const EdgeInsets.only(left: 8, bottom: 12),
           child: Text(
             title,
-            style: AppText.h4.copyWith(color: Colors.grey[800]),
+            style: AppText.h4.copyWith(color: AppColor.textPrimary),
           ),
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColor.white,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: AppColor.shadow,
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -537,7 +543,7 @@ class ProfileView extends GetView<ProfileViewController> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppColor.secondaryColor.withOpacity(0.1),
+                color: AppColor.secondaryColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: AppColor.secondaryColor, size: 24),
@@ -548,11 +554,11 @@ class ProfileView extends GetView<ProfileViewController> {
                 title,
                 style: AppText.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: AppColor.textPrimary,
                 ),
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 16),
+            const Icon(Icons.arrow_forward_ios_rounded, color: AppColor.textHint, size: 16),
           ],
         ),
       ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:mobile_banking_app/app/app_color.dart';
+import 'package:mobile_banking_app/app/app_text.dart';
 import 'package:mobile_banking_app/screen/auth/verify_otp/verify_otp_controller.dart';
 
-class VerifyOtpView
-    extends GetView<
-        VerifyOtpViewController> {
+class VerifyOtpView extends GetView<VerifyOtpViewController> {
   const VerifyOtpView({
     super.key,
   });
@@ -15,18 +15,23 @@ class VerifyOtpView
     BuildContext context,
   ) {
     return Scaffold(
+      backgroundColor: AppColor.scaffoldBackground,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'ផ្ទៀងផ្ទាត់ OTP',
+          style: AppText.h4.copyWith(color: AppColor.textPrimary),
         ),
         centerTitle: true,
+        backgroundColor: AppColor.white,
+        surfaceTintColor: AppColor.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: AppColor.textPrimary),
       ),
       body: SafeArea(
         child: Form(
           key: controller.formKey,
           child: SingleChildScrollView(
-            padding:
-                const EdgeInsets.all(
+            padding: const EdgeInsets.all(
               24,
             ),
             child: Column(
@@ -38,20 +43,16 @@ class VerifyOtpView
                 Container(
                   width: 100,
                   height: 100,
-                  decoration:
-                      BoxDecoration(
-                    color: Colors.blue
-                        .withValues(
+                  decoration: BoxDecoration(
+                    color: AppColor.secondaryColor.withValues(
                       alpha: 0.10,
                     ),
-                    shape:
-                        BoxShape.circle,
+                    shape: BoxShape.circle,
                   ),
                   child: const Icon(
-                    Icons
-                        .mark_email_read_outlined,
+                    Icons.mark_email_read_outlined,
                     size: 48,
-                    color: Colors.blue,
+                    color: AppColor.secondaryColor,
                   ),
                 ),
 
@@ -59,14 +60,12 @@ class VerifyOtpView
                   height: 28,
                 ),
 
-                const Text(
+                Text(
                   'បញ្ចូលលេខកូដ OTP',
-                  textAlign:
-                      TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight:
-                        FontWeight.bold,
+                  textAlign: TextAlign.center,
+                  style: AppText.h3.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.textPrimary,
                   ),
                 ),
 
@@ -76,12 +75,9 @@ class VerifyOtpView
 
                 Text(
                   'យើងបានផ្ញើលេខកូដ OTP ទៅលេខទូរស័ព្ទ',
-                  textAlign:
-                      TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors
-                        .grey.shade600,
+                  textAlign: TextAlign.center,
+                  style: AppText.bodyMedium.copyWith(
+                    color: AppColor.textSecondary,
                   ),
                 ),
 
@@ -91,13 +87,10 @@ class VerifyOtpView
 
                 Obx(
                   () => Text(
-                    controller
-                        .maskedPhoneNumber,
-                    style:
-                        const TextStyle(
-                      fontSize: 17,
-                      fontWeight:
-                          FontWeight.w600,
+                    controller.maskedPhoneNumber,
+                    style: AppText.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColor.textPrimary,
                     ),
                   ),
                 ),
@@ -107,79 +100,65 @@ class VerifyOtpView
                 ),
 
                 TextFormField(
-                  controller:
-                      controller
-                          .otpController,
-                  keyboardType:
-                      TextInputType.number,
-                  textInputAction:
-                      TextInputAction.done,
-                  textAlign:
-                      TextAlign.center,
+                  controller: controller.otpController,
+                  keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.done,
+                  textAlign: TextAlign.center,
                   maxLength: 6,
                   autofocus: true,
                   inputFormatters: [
-                    FilteringTextInputFormatter
-                        .digitsOnly,
+                    FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(
                       6,
                     ),
                   ],
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight:
-                        FontWeight.bold,
+                  style: AppText.h2.copyWith(
+                    fontWeight: FontWeight.bold,
                     letterSpacing: 12,
+                    color: AppColor.textPrimary,
                   ),
-                  decoration:
-                      InputDecoration(
+                  decoration: InputDecoration(
                     hintText: '000000',
+                    hintStyle: AppText.h2.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 12,
+                      color: AppColor.textHint,
+                    ),
                     counterText: '',
-                    prefixIcon:
-                        const Icon(
-                      Icons
-                          .password_outlined,
+                    filled: true,
+                    fillColor: AppColor.white,
+                    prefixIcon: const Icon(
+                      Icons.password_outlined,
+                      color: AppColor.secondaryColor,
                     ),
-                    border:
-                        OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
                         12,
                       ),
+                      borderSide: BorderSide.none,
                     ),
-                    enabledBorder:
-                        OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
                         12,
                       ),
-                      borderSide:
-                          BorderSide(
-                        color: Colors
-                            .grey.shade300,
+                      borderSide: const BorderSide(
+                        color: AppColor.background,
                       ),
                     ),
-                    focusedBorder:
-                        OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(
                         12,
                       ),
-                      borderSide:
-                          const BorderSide(
-                        color:
-                            Colors.blue,
+                      borderSide: const BorderSide(
+                        color: AppColor.secondaryColor,
                         width: 2,
                       ),
                     ),
                   ),
-                  validator:
-                      controller.validateOtp,
+                  validator: controller.validateOtp,
                   onFieldSubmitted: (_) {
-                    if (!controller
-                        .isLoading.value) {
-                      controller
-                          .verifyOtp();
+                    if (!controller.isLoading.value) {
+                      controller.verifyOtp();
                     }
                   },
                 ),
@@ -190,40 +169,33 @@ class VerifyOtpView
 
                 Obx(
                   () => SizedBox(
-                    width:
-                        double.infinity,
+                    width: double.infinity,
                     height: 52,
-                    child:
-                        ElevatedButton(
-                      onPressed: controller
-                              .isLoading
-                              .value
+                    child: ElevatedButton(
+                      onPressed: controller.isLoading.value
                           ? null
-                          : controller
-                              .verifyOtp,
-                      child: controller
-                              .isLoading
-                              .value
+                          : controller.verifyOtp,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColor.secondaryColor,
+                        foregroundColor: AppColor.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: controller.isLoading.value
                           ? const SizedBox(
                               width: 22,
                               height: 22,
-                              child:
-                                  CircularProgressIndicator(
-                                strokeWidth:
-                                    2,
-                                color:
-                                    Colors.white,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColor.white,
                               ),
                             )
-                          : const Text(
+                          : Text(
                               'ផ្ទៀងផ្ទាត់',
-                              style:
-                                  TextStyle(
-                                fontSize:
-                                    16,
-                                fontWeight:
-                                    FontWeight
-                                        .bold,
+                              style: AppText.bodyLarge.copyWith(
+                                color: AppColor.white,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                     ),
@@ -236,46 +208,38 @@ class VerifyOtpView
 
                 Obx(
                   () {
-                    if (controller
-                            .secondsRemaining
-                            .value >
-                        0) {
+                    if (controller.secondsRemaining.value > 0) {
                       return Text(
                         'ផ្ញើ OTP ម្ដងទៀតក្នុង ${controller.secondsRemaining.value} វិនាទី',
-                        style:
-                            TextStyle(
-                          color: Colors
-                              .grey
-                              .shade600,
+                        style: AppText.bodySmall.copyWith(
+                          color: AppColor.textSecondary,
                         ),
                       );
                     }
 
                     return TextButton.icon(
-                      onPressed: controller
-                              .isResending
-                              .value
+                      onPressed: controller.isResending.value
                           ? null
-                          : controller
-                              .resendOtp,
-                      icon: controller
-                              .isResending
-                              .value
+                          : controller.resendOtp,
+                      icon: controller.isResending.value
                           ? const SizedBox(
                               width: 18,
                               height: 18,
-                              child:
-                                  CircularProgressIndicator(
-                                strokeWidth:
-                                    2,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColor.secondaryColor,
                               ),
                             )
                           : const Icon(
-                              Icons
-                                  .refresh,
+                              Icons.refresh,
+                              color: AppColor.secondaryColor,
                             ),
-                      label: const Text(
+                      label: Text(
                         'ផ្ញើ OTP ម្ដងទៀត',
+                        style: AppText.bodySmall.copyWith(
+                          color: AppColor.secondaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     );
                   },
@@ -289,8 +253,11 @@ class VerifyOtpView
                   onPressed: () {
                     Get.back();
                   },
-                  child: const Text(
+                  child: Text(
                     'កែលេខទូរស័ព្ទ',
+                    style: AppText.bodySmall.copyWith(
+                      color: AppColor.textSecondary,
+                    ),
                   ),
                 ),
               ],

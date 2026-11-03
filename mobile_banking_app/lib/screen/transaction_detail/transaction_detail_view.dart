@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
+import 'package:mobile_banking_app/app/app_color.dart';
+import 'package:mobile_banking_app/app/app_text.dart';
 import 'package:mobile_banking_app/core/model/transaction_model.dart';
-
 import 'transaction_detail_controller.dart';
 
 class TransactionDetailView extends StatefulWidget {
@@ -49,20 +49,18 @@ class _TransactionDetailViewState
     BuildContext context,
   ) {
     return Scaffold(
-      backgroundColor: const Color(
-        0xffF7F8FA,
-      ),
+      backgroundColor: AppColor.scaffoldBackground,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColor.white,
         elevation: 0,
         centerTitle: true,
         iconTheme: const IconThemeData(
-          color: Colors.black,
+          color: AppColor.textPrimary,
         ),
-        title: const Text(
+        title: Text(
           'Transaction Details',
-          style: TextStyle(
-            color: Colors.black,
+          style: AppText.h4.copyWith(
+            color: AppColor.textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -71,7 +69,7 @@ class _TransactionDetailViewState
         () {
           if (controller.isLoading.value) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(color: AppColor.secondaryColor),
             );
           }
 
@@ -86,9 +84,10 @@ class _TransactionDetailViewState
               controller.transaction.value;
 
           if (transaction == null) {
-            return const Center(
+            return Center(
               child: Text(
                 'Transaction not found',
+                style: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
               ),
             );
           }
@@ -148,10 +147,10 @@ class _DetailBody extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: incoming
-                  ? Colors.green.withValues(
+                  ? AppColor.primaryColor.withValues(
                       alpha: 0.10,
                     )
-                  : Colors.red.withValues(
+                  : AppColor.red.withValues(
                       alpha: 0.10,
                     ),
             ),
@@ -159,8 +158,8 @@ class _DetailBody extends StatelessWidget {
               _getIcon(),
               size: 36,
               color: incoming
-                  ? Colors.green
-                  : Colors.red,
+                  ? AppColor.primaryColor
+                  : AppColor.red,
             ),
           ),
 
@@ -175,8 +174,8 @@ class _DetailBody extends StatelessWidget {
           Text(
             _getTitle(),
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 19,
+            style: AppText.h4.copyWith(
+              color: AppColor.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -193,12 +192,11 @@ class _DetailBody extends StatelessWidget {
             '$amountSign'
             '${_currencySymbol()}'
             '${transaction.amount.toStringAsFixed(2)}',
-            style: TextStyle(
-              fontSize: 32,
+            style: AppText.h1.copyWith(
               fontWeight: FontWeight.bold,
               color: incoming
-                  ? Colors.green
-                  : Colors.red,
+                  ? AppColor.primaryColor
+                  : AppColor.red,
             ),
           ),
 
@@ -251,387 +249,170 @@ class _DetailBody extends StatelessWidget {
               _divider(),
 
               _DetailRow(
-                title: 'Amount',
-                value:
-                    '${_currencySymbol()}'
-                    '${transaction.amount.toStringAsFixed(2)}',
-              ),
-
-              _divider(),
-
-              _DetailRow(
-                title: 'Currency',
-                value: transaction.currency,
-              ),
-
-              _divider(),
-
-              _DetailRow(
-                title: 'Status',
-                value: _formatText(
-                  transaction.status,
-                ),
-              ),
-
-              _divider(),
-
-              _DetailRow(
                 title: 'Date & Time',
                 value: formattedDate,
               ),
+
+              if (transaction.description.isNotEmpty) ...[
+                _divider(),
+
+                _DetailRow(
+                  title: 'Description',
+                  value: transaction.description,
+                ),
+              ],
             ],
           ),
 
           const SizedBox(
-            height: 16,
+            height: 20,
           ),
 
           // =================================================
-          // TRANSFER DETAIL
+          // SENDER INFORMATION
           // =================================================
 
-          if (transaction.isTransfer)
+          if (transaction.senderName.isNotEmpty ||
+              transaction.senderAccountNumber.isNotEmpty) ...[
             _SectionCard(
-              title: 'Transfer Detail',
+              title: 'Sender Details',
               children: [
-                if (
-                  transaction
-                      .counterpartyName
-                      .isNotEmpty
-                ) ...[
+                if (transaction.senderName.isNotEmpty)
                   _DetailRow(
-                    title:
-                        transaction.isIncoming
-                            ? 'From'
-                            : 'To',
-                    value:
-                        transaction
-                            .counterpartyName,
+                    title: 'Sender Name',
+                    value: transaction.senderName,
                   ),
 
+                if (transaction.senderAccountNumber.isNotEmpty) ...[
                   _divider(),
-                ],
 
-                if (
-                  transaction
-                      .counterpartyAccount
-                      .isNotEmpty
-                ) ...[
-                  _DetailRow(
-                    title: 'Account Number',
-                    value:
-                        transaction
-                            .counterpartyAccount,
-                  ),
-
-                  _divider(),
-                ],
-
-                if (
-                  transaction
-                      .senderName
-                      .isNotEmpty
-                ) ...[
-                  _DetailRow(
-                    title: 'Sender',
-                    value:
-                        transaction.senderName,
-                  ),
-
-                  _divider(),
-                ],
-
-                if (
-                  transaction
-                      .senderAccountNumber
-                      .isNotEmpty
-                ) ...[
                   _DetailRow(
                     title: 'Sender Account',
-                    value:
-                        transaction
-                            .senderAccountNumber,
+                    value: transaction.senderAccountNumber,
                   ),
-
-                  _divider(),
                 ],
+              ],
+            ),
 
-                if (
-                  transaction
-                      .receiverName
-                      .isNotEmpty
-                ) ...[
+            const SizedBox(
+              height: 20,
+            ),
+          ],
+
+          // =================================================
+          // RECEIVER INFORMATION
+          // =================================================
+
+          if (transaction.receiverName.isNotEmpty ||
+              transaction.receiverAccountNumber.isNotEmpty) ...[
+            _SectionCard(
+              title: 'Receiver Details',
+              children: [
+                if (transaction.receiverName.isNotEmpty)
                   _DetailRow(
-                    title: 'Receiver',
-                    value:
-                        transaction.receiverName,
+                    title: 'Receiver Name',
+                    value: transaction.receiverName,
                   ),
 
+                if (transaction.receiverAccountNumber.isNotEmpty) ...[
                   _divider(),
-                ],
 
-                if (
-                  transaction
-                      .receiverAccountNumber
-                      .isNotEmpty
-                )
                   _DetailRow(
                     title: 'Receiver Account',
-                    value:
-                        transaction
-                            .receiverAccountNumber,
-                  ),
-              ],
-            ),
-
-          // =================================================
-          // DEPOSIT DETAIL
-          // =================================================
-
-          if (transaction.isDeposit) ...[
-            _SectionCard(
-              title: 'Deposit Detail',
-              children: [
-                _DetailRow(
-                  title: 'Deposit Type',
-                  value: 'Cash Deposit',
-                ),
-
-                if (
-                  transaction
-                      .agentName
-                      .isNotEmpty
-                ) ...[
-                  _divider(),
-
-                  _DetailRow(
-                    title: 'Agent',
-                    value:
-                        transaction.agentName,
+                    value: transaction.receiverAccountNumber,
                   ),
                 ],
               ],
             ),
 
             const SizedBox(
-              height: 16,
+              height: 20,
             ),
           ],
-
-          // =================================================
-          // PAYMENT DETAIL
-          // =================================================
-
-          if (transaction.isPayment) ...[
-            _SectionCard(
-              title: 'Payment Detail',
-              children: [
-                _DetailRow(
-                  title: 'Payment',
-                  value:
-                      transaction
-                              .counterpartyName
-                              .isEmpty
-                          ? 'Payment'
-                          : transaction
-                              .counterpartyName,
-                ),
-
-                if (
-                  transaction
-                      .counterpartyAccount
-                      .isNotEmpty
-                ) ...[
-                  _divider(),
-
-                  _DetailRow(
-                    title: 'Account',
-                    value:
-                        transaction
-                            .counterpartyAccount,
-                  ),
-                ],
-              ],
-            ),
-
-            const SizedBox(
-              height: 16,
-            ),
-          ],
-
-          if (transaction.isTransfer)
-            const SizedBox(
-              height: 16,
-            ),
-
-         
-
-            
         ],
       ),
     );
   }
 
-  // =======================================================
-  // TITLE
-  // =======================================================
-
-  String _getTitle() {
-    if (transaction.isDeposit) {
-      if (
-        transaction
-            .agentName
-            .isNotEmpty
-      ) {
-        return transaction.agentName;
-      }
-
-      return 'Cash Deposit';
+  String _formatDate(
+    DateTime? dateTime,
+  ) {
+    if (dateTime == null) {
+      return '-';
     }
 
-    if (transaction.isPayment) {
-      if (
-        transaction
-            .counterpartyName
-            .isNotEmpty
-      ) {
-        return transaction.counterpartyName;
-      }
+    try {
+      final local = dateTime.toLocal();
 
-      return 'Payment';
+      return DateFormat('yyyy-MM-dd • hh:mm a').format(local);
+    } catch (_) {
+      return dateTime.toString();
     }
-
-    if (
-      transaction
-          .counterpartyName
-          .isNotEmpty
-    ) {
-      return transaction.counterpartyName;
-    }
-
-    if (
-      transaction.isIncoming
-    ) {
-      return 'Money Received';
-    }
-
-    if (
-      transaction.isOutgoing
-    ) {
-      return 'Money Sent';
-    }
-
-    return 'Transaction';
   }
-
-  // =======================================================
-  // ICON
-  // =======================================================
 
   IconData _getIcon() {
     if (transaction.isDeposit) {
-      return Icons
-          .account_balance_wallet_outlined;
+      return Icons.account_balance_wallet_rounded;
     }
 
-    if (transaction.isPayment) {
-      return Icons
-          .payments_outlined;
+    if (transaction.type.toLowerCase().contains('qr')) {
+      return Icons.qr_code_rounded;
     }
 
-    if (transaction.isIncoming) {
-      return Icons
-          .south_west_rounded;
-    }
-
-    return Icons
-        .north_east_rounded;
+    return transaction.isIncoming
+        ? Icons.arrow_downward_rounded
+        : Icons.arrow_upward_rounded;
   }
 
-  // =======================================================
-  // CURRENCY
-  // =======================================================
+  String _getTitle() {
+    if (transaction.isDeposit) {
+      return 'Cash Deposit';
+    }
+
+    final counterparty = transaction.counterpartyName;
+
+    if (counterparty.trim().isNotEmpty) {
+      return counterparty;
+    }
+
+    return _formatText(
+      transaction.type,
+    );
+  }
 
   String _currencySymbol() {
-    final String currency =
-        transaction.currency
-            .toUpperCase();
+    final currency = transaction.currency.toUpperCase();
 
-    if (currency == 'USD') {
-      return '\$';
-    }
+    if (currency == 'USD') return '\$';
 
-    if (currency == 'KHR') {
-      return '៛';
-    }
+    if (currency == 'KHR') return '៛';
 
     return '$currency ';
   }
 
-  // =======================================================
-  // FORMAT DATE
-  // =======================================================
-
-  String _formatDate(
-    DateTime? date,
-  ) {
-    if (date == null) {
-      return '-';
-    }
-
-    return DateFormat(
-      'dd MMM yyyy, hh:mm a',
-    ).format(
-      date.toLocal(),
-    );
-  }
-
-  // =======================================================
-  // FORMAT TEXT
-  // =======================================================
-
   String _formatText(
-    String value,
+    String raw,
   ) {
-    if (value.isEmpty) {
+    if (raw.isEmpty) {
       return '-';
     }
 
-    final String cleanValue =
-        value
-            .replaceAll(
-              '_',
-              ' ',
-            )
-            .trim();
-
-    if (cleanValue.isEmpty) {
-      return '-';
-    }
-
-    return cleanValue
+    return raw
+        .replaceAll('_', ' ')
         .split(' ')
         .map(
-          (word) {
-            if (word.isEmpty) {
-              return '';
-            }
-
-            return word[0]
-                    .toUpperCase() +
-                word
-                    .substring(1)
-                    .toLowerCase();
-          },
+          (word) => word.isNotEmpty
+              ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+              : '',
         )
         .join(' ');
   }
 
   Widget _divider() {
-    return Divider(
+    return const Divider(
       height: 28,
       thickness: 1,
-      color: Colors.grey.shade200,
+      color: AppColor.background,
     );
   }
 }
@@ -660,16 +441,13 @@ class _SectionCard extends StatelessWidget {
         18,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(
+        color: AppColor.white,
+        borderRadius: BorderRadius.circular(
           20,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(
-              alpha: 0.04,
-            ),
+            color: AppColor.shadow,
             blurRadius: 15,
             offset: const Offset(
               0,
@@ -679,15 +457,13 @@ class _SectionCard extends StatelessWidget {
         ],
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight:
-                  FontWeight.bold,
+            style: AppText.bodyLarge.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppColor.textPrimary,
             ),
           ),
 
@@ -722,17 +498,14 @@ class _DetailRow
     BuildContext context,
   ) {
     return Row(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           flex: 4,
           child: Text(
             title,
-            style: TextStyle(
-              fontSize: 14,
-              color:
-                  Colors.grey.shade600,
+            style: AppText.bodySmall.copyWith(
+              color: AppColor.textSecondary,
             ),
           ),
         ),
@@ -747,12 +520,10 @@ class _DetailRow
             value.isEmpty
                 ? '-'
                 : value,
-            textAlign:
-                TextAlign.right,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight:
-                  FontWeight.w600,
+            textAlign: TextAlign.right,
+            style: AppText.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColor.textPrimary,
             ),
           ),
         ),
@@ -791,36 +562,32 @@ class _StatusBadge
       value == 'completed' ||
       value == 'approved'
     ) {
-      color = Colors.green;
+      color = AppColor.primaryColor;
 
-      icon =
-          Icons.check_circle_rounded;
+      icon = Icons.check_circle_rounded;
 
       text = 'SUCCESS';
     } else if (
       value == 'failed' ||
       value == 'rejected'
     ) {
-      color = Colors.red;
+      color = AppColor.red;
 
-      icon =
-          Icons.cancel_rounded;
+      icon = Icons.cancel_rounded;
 
       text = 'FAILED';
     } else if (
       value == 'pending'
     ) {
-      color = Colors.orange;
+      color = AppColor.secondaryColor;
 
-      icon =
-          Icons.access_time_rounded;
+      icon = Icons.access_time_rounded;
 
       text = 'PENDING';
     } else {
-      color = Colors.grey;
+      color = AppColor.textSecondary;
 
-      icon =
-          Icons.info_outline_rounded;
+      icon = Icons.info_outline_rounded;
 
       text = status.isEmpty
           ? 'UNKNOWN'
@@ -828,8 +595,7 @@ class _StatusBadge
     }
 
     return Container(
-      padding:
-          const EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 14,
         vertical: 8,
       ),
@@ -837,14 +603,12 @@ class _StatusBadge
         color: color.withValues(
           alpha: 0.10,
         ),
-        borderRadius:
-            BorderRadius.circular(
+        borderRadius: BorderRadius.circular(
           30,
         ),
       ),
       child: Row(
-        mainAxisSize:
-            MainAxisSize.min,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             icon,
@@ -858,10 +622,8 @@ class _StatusBadge
 
           Text(
             text,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight:
-                  FontWeight.w600,
+            style: AppText.labelSmall.copyWith(
+              fontWeight: FontWeight.w600,
               color: color,
             ),
           ),
@@ -893,32 +655,27 @@ class _ErrorView
   ) {
     return Center(
       child: Padding(
-        padding:
-            const EdgeInsets.all(
+        padding: const EdgeInsets.all(
           24,
         ),
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons
-                  .error_outline_rounded,
+            const Icon(
+              Icons.error_outline_rounded,
               size: 60,
-              color:
-                  Colors.red.shade400,
+              color: AppColor.red,
             ),
 
             const SizedBox(
               height: 15,
             ),
 
-            const Text(
+            Text(
               'Unable to load transaction',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight:
-                    FontWeight.bold,
+              style: AppText.h4.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColor.textPrimary,
               ),
             ),
 
@@ -928,11 +685,9 @@ class _ErrorView
 
             Text(
               message,
-              textAlign:
-                  TextAlign.center,
-              style: TextStyle(
-                color:
-                    Colors.grey.shade600,
+              textAlign: TextAlign.center,
+              style: AppText.bodyMedium.copyWith(
+                color: AppColor.textSecondary,
               ),
             ),
 
@@ -944,6 +699,10 @@ class _ErrorView
               onPressed: () {
                 onRetry();
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColor.secondaryColor,
+                foregroundColor: AppColor.white,
+              ),
               icon: const Icon(
                 Icons.refresh,
               ),

@@ -30,6 +30,30 @@ class SendController
   final receiverFound =
       false.obs;
 
+  final TextEditingController amountController =
+      TextEditingController();
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (amount.value.isNotEmpty) {
+      amountController.text = amount.value;
+    }
+  }
+
+  void selectAmount(String val) {
+    if (amount.value == val) {
+      amount.value = '';
+      amountController.clear();
+    } else {
+      amount.value = val;
+      amountController.text = val;
+      amountController.selection = TextSelection.fromPosition(
+        TextPosition(offset: val.length),
+      );
+    }
+  }
+
 
   // =====================================================
   // FIND RECEIVER
@@ -257,6 +281,14 @@ class SendController
 
     amount.value =
         '';
+
+    amountController.clear();
+  }
+
+  @override
+  void onClose() {
+    amountController.dispose();
+    super.onClose();
   }
 
 

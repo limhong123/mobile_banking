@@ -180,6 +180,22 @@ export async function getSystemWallet() {
 
 
 
+export async function getBankFinancialSummary() {
+
+  const response = await api.get(
+
+    "/admin/wallet/financial-summary"
+
+  );
+
+
+
+  return response.data;
+
+}
+
+
+
 export async function fundSystemWallet(
 
   amount,
@@ -215,6 +231,30 @@ export async function getSystemWalletHistory() {
   const response = await api.get(
 
     "/admin/wallet/history"
+
+  );
+
+
+
+  return response.data;
+
+}
+
+
+
+export async function reconcileSystemWallet(action, payload = {}) {
+
+  const response = await api.post(
+
+    "/admin/wallet/reconcile",
+
+    {
+
+      action,
+
+      ...payload,
+
+    }
 
   );
 
@@ -295,5 +335,49 @@ export async function debitAgent(agentId, { amount, description, reference } = {
     description,
     reference,
   });
+  return response.data;
+}
+
+// ==========================================
+// SAVINGS
+// ==========================================
+
+export async function getSavingsTerms() {
+  const response = await api.get('/admin/savings/terms');
+  return response.data;
+}
+
+export async function createSavingsTerm(data) {
+  const response = await api.post('/admin/savings/terms', data);
+  return response.data;
+}
+
+export async function updateSavingsTerm(id, data) {
+  const response = await api.patch(`/admin/savings/terms/${id}`, data);
+  return response.data;
+}
+
+export async function deleteSavingsTerm(id) {
+  const response = await api.delete(`/admin/savings/terms/${id}`);
+  return response.data;
+}
+
+export async function getSavingsSettings() {
+  const response = await api.get('/admin/savings/settings');
+  return response.data;
+}
+
+export async function updateSavingsSettings(data) {
+  const response = await api.put('/admin/savings/settings', data);
+  return response.data;
+}
+
+export async function getSavingsOverview() {
+  const response = await api.get('/admin/savings/overview');
+  return response.data;
+}
+
+export async function simulateSavingsMaturity(id) {
+  const response = await api.post(`/admin/savings/${id}/simulate-maturity`);
   return response.data;
 }

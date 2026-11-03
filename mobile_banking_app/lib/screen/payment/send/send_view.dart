@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:mobile_banking_app/app/app_color.dart';
 import 'package:mobile_banking_app/app/app_text.dart';
@@ -10,22 +11,22 @@ class SendView extends GetView<SendController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.background,
+      backgroundColor: AppColor.scaffoldBackground,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          color: Colors.black87,
+          color: AppColor.textPrimary,
         ),
         title: Text(
           'Send Money',
-          style: AppText.h3.copyWith(color: Colors.black87),
+          style: AppText.h3.copyWith(color: AppColor.textPrimary),
         ),
         centerTitle: true,
-        backgroundColor: AppColor.background,
-        foregroundColor: Colors.black87,
+        backgroundColor: AppColor.scaffoldBackground,
+        foregroundColor: AppColor.textPrimary,
         elevation: 0,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: AppColor.transparent,
       ),
       body: Obx(
         () => SingleChildScrollView(
@@ -42,13 +43,13 @@ class SendView extends GetView<SendController> {
                     end: Alignment.bottomRight,
                     colors: [
                       AppColor.secondaryColor,
-                      AppColor.secondaryColor.withOpacity(0.8),
+                      AppColor.secondaryColor.withValues(alpha: 0.8),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColor.secondaryColor.withOpacity(0.3),
+                      color: AppColor.secondaryColor.withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -60,7 +61,7 @@ class SendView extends GetView<SendController> {
                     Text(
                       'Transfer',
                       style: AppText.labelSmall.copyWith(
-                        color: Colors.white70,
+                        color: AppColor.white.withValues(alpha: 0.7),
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -68,23 +69,23 @@ class SendView extends GetView<SendController> {
                     Text(
                       'Fast, secure, and simple.',
                       style: AppText.h2.copyWith(
-                        color: Colors.white,
+                        color: AppColor.white,
                         height: 1.2,
                       ),
                     ),
                     const SizedBox(height: 20),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.security_rounded,
-                          color: Colors.white70,
+                          color: AppColor.white.withValues(alpha: 0.7),
                           size: 18,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'Protected by bank-grade security',
                           style: AppText.labelSmall.copyWith(
-                            color: Colors.white70,
+                            color: AppColor.white.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -98,17 +99,17 @@ class SendView extends GetView<SendController> {
               if (!controller.receiverFound.value) ...[
                 Text(
                   'Receiver Details',
-                  style: AppText.h4.copyWith(color: Colors.black87),
+                  style: AppText.h4.copyWith(color: AppColor.textPrimary),
                 ),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColor.white,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
+                        color: AppColor.shadow,
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -123,13 +124,13 @@ class SendView extends GetView<SendController> {
                         textCapitalization: TextCapitalization.characters,
                         style: AppText.bodyLarge.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: AppColor.textPrimary,
                         ),
                         decoration: InputDecoration(
                           labelText: 'Account Number',
-                          labelStyle: AppText.bodyMedium.copyWith(color: Colors.grey),
+                          labelStyle: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
                           hintText: 'KHP123456789',
-                          hintStyle: AppText.bodyLarge.copyWith(color: Colors.grey.shade400),
+                          hintStyle: AppText.bodyLarge.copyWith(color: AppColor.textHint),
                           filled: true,
                           fillColor: AppColor.background,
                           prefixIcon: Icon(
@@ -156,7 +157,7 @@ class SendView extends GetView<SendController> {
                               : controller.findReceiver,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColor.secondaryColor,
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColor.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -168,12 +169,12 @@ class SendView extends GetView<SendController> {
                                   height: 24,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2.5,
-                                    color: Colors.white,
+                                    color: AppColor.white,
                                   ),
                                 )
                               : Text(
                                   'Continue',
-                                  style: AppText.h4.copyWith(color: Colors.white),
+                                  style: AppText.h4.copyWith(color: AppColor.white),
                                 ),
                         ),
                       ),
@@ -183,18 +184,18 @@ class SendView extends GetView<SendController> {
               ] else ...[
                 Text(
                   'Recipient',
-                  style: AppText.h4.copyWith(color: Colors.black87),
+                  style: AppText.h4.copyWith(color: AppColor.textPrimary),
                 ),
                 const SizedBox(height: 16),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColor.white,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
+                        color: AppColor.shadow,
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -206,7 +207,7 @@ class SendView extends GetView<SendController> {
                         width: 64,
                         height: 64,
                         decoration: BoxDecoration(
-                          color: AppColor.secondaryColor.withOpacity(0.1),
+                          color: AppColor.secondaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Icon(
@@ -222,13 +223,13 @@ class SendView extends GetView<SendController> {
                           children: [
                             Text(
                               controller.receiverName.value,
-                              style: AppText.h4.copyWith(color: Colors.black87),
+                              style: AppText.h4.copyWith(color: AppColor.textPrimary),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               controller.receiverAccountNumber.value,
                               style: AppText.bodyMedium.copyWith(
-                                color: Colors.grey.shade600,
+                                color: AppColor.textSecondary,
                               ),
                             ),
                           ],
@@ -242,17 +243,17 @@ class SendView extends GetView<SendController> {
 
                 Text(
                   'Amount',
-                  style: AppText.h4.copyWith(color: Colors.black87),
+                  style: AppText.h4.copyWith(color: AppColor.textPrimary),
                 ),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColor.white,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
+                        color: AppColor.shadow,
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -262,24 +263,29 @@ class SendView extends GetView<SendController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextFormField(
-                        initialValue: controller.amount.value,
+                        controller: controller.amountController,
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d*\.?\d{0,2}'),
+                          ),
+                        ],
                         onChanged: (value) => controller.amount.value = value,
                         style: AppText.h1.copyWith(
                           fontWeight: FontWeight.w800,
-                          color: Colors.black87,
+                          color: AppColor.textPrimary,
                         ),
                         decoration: InputDecoration(
                           prefixText: '\$ ',
                           prefixStyle: AppText.h1.copyWith(
-                            color: Colors.black87,
+                            color: AppColor.textPrimary,
                             fontWeight: FontWeight.w800,
                           ),
                           hintText: '0.00',
                           hintStyle: AppText.h1.copyWith(
-                            color: Colors.grey.shade300,
+                            color: AppColor.textHint,
                             fontWeight: FontWeight.w800,
                           ),
                           border: InputBorder.none,
@@ -287,40 +293,63 @@ class SendView extends GetView<SendController> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Container(height: 1, color: Colors.grey.shade100),
+                      Container(height: 1, color: AppColor.background),
                       const SizedBox(height: 20),
                       Wrap(
                         spacing: 12,
                         runSpacing: 12,
                         children: ['25', '50', '100', '250']
                             .map(
-                              (amount) => InkWell(
-                                borderRadius: BorderRadius.circular(12),
-                                onTap: () {
-                                  controller.amount.value = amount;
-                                  // Workaround to reset the text field value since we can't easily access its controller here,
-                                  // but getx might handle it if it was bound properly.
-                                  // For a full fix we would need TextEditingController.
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColor.secondaryColor.withOpacity(0.08),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: AppColor.secondaryColor.withOpacity(0.2)),
-                                  ),
-                                  child: Text(
-                                    '\$$amount',
-                                    style: AppText.bodyMedium.copyWith(
-                                      color: AppColor.secondaryColor,
-                                      fontWeight: FontWeight.w700,
+                              (amount) {
+                                final isSelected =
+                                    controller.amount.value.trim() == amount;
+                                return InkWell(
+                                  borderRadius: BorderRadius.circular(12),
+                                  onTap: () =>
+                                      controller.selectAmount(amount),
+                                  child: AnimatedContainer(
+                                    duration:
+                                        const Duration(milliseconds: 200),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? AppColor.secondaryColor
+                                          : AppColor.secondaryColor
+                                              .withValues(alpha: 0.08),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? AppColor.secondaryColor
+                                            : AppColor.secondaryColor
+                                                .withValues(alpha: 0.2),
+                                        width: isSelected ? 1.5 : 1.0,
+                                      ),
+                                      boxShadow: isSelected
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColor.secondaryColor
+                                                    .withValues(alpha: 0.25),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    child: Text(
+                                      '\$$amount',
+                                      style: AppText.bodyMedium.copyWith(
+                                        color: isSelected
+                                            ? AppColor.white
+                                            : AppColor.secondaryColor,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             )
                             .toList(),
                       ),
@@ -339,7 +368,7 @@ class SendView extends GetView<SendController> {
                         : controller.sendMoney,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColor.secondaryColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColor.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -351,12 +380,12 @@ class SendView extends GetView<SendController> {
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              color: Colors.white,
+                              color: AppColor.white,
                             ),
                           )
                         : Text(
                             'Send Money',
-                            style: AppText.h4.copyWith(color: Colors.white),
+                            style: AppText.h4.copyWith(color: AppColor.white),
                           ),
                   ),
                 ),
@@ -369,15 +398,18 @@ class SendView extends GetView<SendController> {
                   child: OutlinedButton(
                     onPressed: controller.resetReceiver,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.black87,
-                      side: BorderSide(color: Colors.grey.shade300),
+                      foregroundColor: AppColor.textPrimary,
+                      side: const BorderSide(color: AppColor.textHint),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     child: Text(
                       'Change Receiver',
-                      style: AppText.bodyMedium.copyWith(fontWeight: FontWeight.w700),
+                      style: AppText.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.textPrimary,
+                      ),
                     ),
                   ),
                 ),

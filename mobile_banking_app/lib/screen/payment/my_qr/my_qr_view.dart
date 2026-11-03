@@ -13,7 +13,7 @@ class MyQrView extends GetView<MyQrController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FD),
+      backgroundColor: AppColor.scaffoldBackground,
 
       // ===================================================
       // APP BAR
@@ -21,15 +21,15 @@ class MyQrView extends GetView<MyQrController> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
 
-        backgroundColor: Colors.white,
+        backgroundColor: AppColor.white,
 
-        surfaceTintColor: Colors.white,
+        surfaceTintColor: AppColor.white,
 
         elevation: 0,
 
         centerTitle: true,
 
-        title: Text('KhemPay QR', style: AppText.h4),
+        title: Text('KhemPay QR', style: AppText.h4.copyWith(color: AppColor.textPrimary)),
 
         actions: [
           Container(
@@ -40,7 +40,7 @@ class MyQrView extends GetView<MyQrController> {
             height: 42,
 
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: AppColor.background,
 
               shape: BoxShape.circle,
             ),
@@ -48,7 +48,7 @@ class MyQrView extends GetView<MyQrController> {
             child: IconButton(
               onPressed: Get.back,
 
-              icon: const Icon(Icons.close),
+              icon: const Icon(Icons.close, color: AppColor.textPrimary),
             ),
           ),
         ],
@@ -63,7 +63,7 @@ class MyQrView extends GetView<MyQrController> {
         // =================================================
 
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: AppColor.secondaryColor));
         }
 
         // =================================================
@@ -79,7 +79,7 @@ class MyQrView extends GetView<MyQrController> {
                 mainAxisSize: MainAxisSize.min,
 
                 children: [
-                  const Icon(Icons.error_outline, size: 60, color: Colors.red),
+                  const Icon(Icons.error_outline, size: 60, color: AppColor.red),
 
                   const SizedBox(height: 16),
 
@@ -87,13 +87,17 @@ class MyQrView extends GetView<MyQrController> {
                     controller.errorMessage.value,
 
                     textAlign: TextAlign.center,
+                    style: AppText.bodyMedium.copyWith(color: AppColor.textPrimary),
                   ),
 
                   const SizedBox(height: 20),
 
                   ElevatedButton(
                     onPressed: controller.loadQr,
-
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColor.secondaryColor,
+                      foregroundColor: AppColor.white,
+                    ),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -107,7 +111,7 @@ class MyQrView extends GetView<MyQrController> {
         // =================================================
 
         return SingleChildScrollView(
-          padding: EdgeInsets.only(top: 30),
+          padding: const EdgeInsets.only(top: 30),
 
           child: Center(
             child: Column(
@@ -125,13 +129,13 @@ class MyQrView extends GetView<MyQrController> {
                     padding: const EdgeInsets.only(bottom: 24),
 
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColor.white,
 
                       borderRadius: BorderRadius.circular(28),
 
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
+                          color: AppColor.shadow,
 
                           blurRadius: 24,
 
@@ -167,7 +171,7 @@ class MyQrView extends GetView<MyQrController> {
                               'KHEMPAY QR',
 
                               style: AppText.h4.copyWith(
-                                color: Colors.white,
+                                color: AppColor.white,
 
                                 fontWeight: FontWeight.w700,
                               ),
@@ -199,6 +203,7 @@ class MyQrView extends GetView<MyQrController> {
                                 style: AppText.h4.copyWith(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 20,
+                                  color: AppColor.textPrimary,
                                 ),
                               ),
 
@@ -220,6 +225,7 @@ class MyQrView extends GetView<MyQrController> {
 
                                         style: AppText.h3.copyWith(
                                           fontWeight: FontWeight.w700,
+                                          color: AppColor.textPrimary,
                                         ),
                                       ),
                                     ),
@@ -233,7 +239,7 @@ class MyQrView extends GetView<MyQrController> {
                                         child: const Icon(
                                           Icons.close,
                                           size: 20,
-                                          color: Colors.grey,
+                                          color: AppColor.textSecondary,
                                         ),
                                       ),
                                     ],
@@ -247,6 +253,7 @@ class MyQrView extends GetView<MyQrController> {
                                     fontSize: 22,
 
                                     fontWeight: FontWeight.w500,
+                                    color: AppColor.textPrimary,
                                   ),
                                 ),
                             ],
@@ -264,7 +271,7 @@ class MyQrView extends GetView<MyQrController> {
 
                             size: 250,
 
-                            backgroundColor: Colors.white,
+                            backgroundColor: AppColor.white,
 
                             errorCorrectionLevel: QrErrorCorrectLevel.M,
                           ),
@@ -294,7 +301,7 @@ class MyQrView extends GetView<MyQrController> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
 
-                      color: Colors.transparent,
+                      color: AppColor.transparent,
 
                       border: Border.all(
                         color: AppColor.secondaryColor,
@@ -339,7 +346,7 @@ class MyQrView extends GetView<MyQrController> {
                     'Account: ${controller.accountNumber.value}',
 
                     style: AppText.labelSmall.copyWith(
-                      color: Colors.grey.shade600,
+                      color: AppColor.textSecondary,
                     ),
                   ),
               ],
@@ -353,13 +360,13 @@ class MyQrView extends GetView<MyQrController> {
       // ===================================================
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColor.white,
 
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
 
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: AppColor.shadow,
 
               blurRadius: 15,
 
@@ -413,9 +420,6 @@ class MyQrView extends GetView<MyQrController> {
   // =====================================================
 
   void _showAmountInput(BuildContext context) {
-    // If QR already has amount,
-    // show existing amount in TextField.
-
     if (controller.selectedAmount.value > 0) {
       controller.amountController.text = controller.selectedAmount.value
           .toStringAsFixed(2);
@@ -438,7 +442,7 @@ class MyQrView extends GetView<MyQrController> {
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
 
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColor.white,
 
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
             ),
@@ -456,7 +460,7 @@ class MyQrView extends GetView<MyQrController> {
                   height: 5,
 
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: AppColor.textHint,
 
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -470,7 +474,10 @@ class MyQrView extends GetView<MyQrController> {
                 Text(
                   'បញ្ចូលចំនួនទឹកប្រាក់',
 
-                  style: AppText.h4.copyWith(fontWeight: FontWeight.bold),
+                  style: AppText.h4.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.textPrimary,
+                  ),
                 ),
 
                 const SizedBox(height: 5),
@@ -480,7 +487,7 @@ class MyQrView extends GetView<MyQrController> {
 
                   style: AppText.bodySmall.copyWith(
                     fontSize: 13,
-                    color: Colors.grey.shade600,
+                    color: AppColor.textSecondary,
                   ),
                 ),
 
@@ -509,18 +516,29 @@ class MyQrView extends GetView<MyQrController> {
                   style: AppText.bodyLarge.copyWith(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
+                    color: AppColor.textPrimary,
                   ),
 
                   decoration: InputDecoration(
                     prefixText: '\$ ',
+                    prefixStyle: AppText.bodyLarge.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.textPrimary,
+                    ),
 
                     hintText: '0.00',
+                    hintStyle: AppText.bodyLarge.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColor.textHint,
+                    ),
 
                     filled: true,
 
-                    fillColor: Color(0xFFF5F6F8),
+                    fillColor: AppColor.background,
 
-                    contentPadding: EdgeInsets.symmetric(
+                    contentPadding: const EdgeInsets.symmetric(
                       vertical: 18,
 
                       horizontal: 15,
@@ -541,7 +559,7 @@ class MyQrView extends GetView<MyQrController> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
 
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: AppColor.secondaryColor,
 
                         width: 1.5,
@@ -554,7 +572,7 @@ class MyQrView extends GetView<MyQrController> {
                   },
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
 
                 // =========================================
                 // GENERATE BUTTON
@@ -570,7 +588,7 @@ class MyQrView extends GetView<MyQrController> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColor.secondaryColor,
 
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColor.white,
 
                       elevation: 0,
 
@@ -584,6 +602,7 @@ class MyQrView extends GetView<MyQrController> {
 
                       style: AppText.bodyMedium.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: AppColor.white,
                       ),
                     ),
                   ),
@@ -593,7 +612,7 @@ class MyQrView extends GetView<MyQrController> {
                 // REMOVE AMOUNT
                 // =========================================
                 if (controller.selectedAmount.value > 0) ...[
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
                   TextButton(
                     onPressed: () {
@@ -602,7 +621,10 @@ class MyQrView extends GetView<MyQrController> {
                       Get.back();
                     },
 
-                    child: Text('ដកចំនួនទឹកប្រាក់ចេញ'),
+                    child: Text(
+                      'ដកចំនួនទឹកប្រាក់ចេញ',
+                      style: AppText.bodySmall.copyWith(color: AppColor.red),
+                    ),
                   ),
                 ],
               ],
@@ -613,7 +635,7 @@ class MyQrView extends GetView<MyQrController> {
 
       isScrollControlled: true,
 
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColor.transparent,
     );
   }
 

@@ -12,10 +12,6 @@ class ProfileViewController extends GetxController {
   
   final isLoading = false.obs;
   
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   void logout() {
     AuthApi().logout();

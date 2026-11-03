@@ -14,6 +14,7 @@ import Users from "./pages/admin/Users";
 import UserKycDetail from "./pages/admin/UserKycDetail";
 import Agents from "./pages/admin/Agents";
 import SystemWallet from "./pages/admin/SystemWallet";
+import Savings from "./pages/admin/Savings";
 
 // Agent Pages
 import AgentDashboard from "./pages/agent/Dashboard";
@@ -57,6 +58,7 @@ export default function App() {
           <Route path="/admin/users/:id" element={<UserKycDetail />} />
           <Route path="/admin/agents" element={<Agents />} />
           <Route path="/admin/wallet" element={<SystemWallet />} />
+          <Route path="/admin/savings" element={<Savings />} />
         </Route>
 
         {/* =================================================

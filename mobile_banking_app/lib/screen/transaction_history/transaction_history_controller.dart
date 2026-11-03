@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import 'package:mobile_banking_app/core/api/transaction_api.dart';
@@ -67,7 +68,7 @@ class TransactionHistoryController extends GetxController {
       errorMessage.value =
           e.toString();
 
-      print(
+      debugPrint(
         'Transaction history error: $e',
       );
     } finally {

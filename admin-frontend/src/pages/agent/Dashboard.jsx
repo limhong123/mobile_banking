@@ -2,9 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   AlertCircle,
+  AlertTriangle,
   ArrowRight,
-  ArrowRightLeft,
-  ArrowUpRight,
   Banknote,
   Building2,
   Check,
@@ -13,18 +12,23 @@ import {
   Copy,
   Eye,
   EyeOff,
-  HandCoins,
   History,
   ReceiptText,
   RefreshCw,
   Search,
   ShieldCheck,
   TrendingUp,
+  UserCheck,
   Wallet,
+  X,
   XCircle,
 } from "lucide-react";
 
-import { getAgentDashboard, getAgentProfile } from "../../api/agentApi";
+import {
+  getAgentDashboard,
+  getAgentProfile,
+  searchCustomer,
+} from "../../api/agentApi";
 
 export default function AgentDashboard() {
   const navigate = useNavigate();
@@ -40,6 +44,12 @@ export default function AgentDashboard() {
   const [copiedId, setCopiedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  // Quick Customer Lookup States
+  const [lookupPhone, setLookupPhone] = useState("");
+  const [lookupCustomerData, setLookupCustomerData] = useState(null);
+  const [lookupSearching, setLookupSearching] = useState(false);
+  const [lookupError, setLookupError] = useState("");
 
   // =====================================================
   // INITIAL LOAD
@@ -84,6 +94,47 @@ export default function AgentDashboard() {
       setLoading(false);
       setRefreshing(false);
     }
+  }
+
+  // =====================================================
+  // QUICK CUSTOMER LOOKUP
+  // =====================================================
+  async function handleQuickLookup(e) {
+    if (e) e.preventDefault();
+    const phone = lookupPhone.trim();
+    if (!phone) {
+      setLookupError("Please enter a customer phone number.");
+      return;
+    }
+
+    try {
+      setLookupSearching(true);
+      setLookupError("");
+      setLookupCustomerData(null);
+
+      const res = await searchCustomer(phone);
+      if (res?.data) {
+        setLookupCustomerData(res.data);
+      } else {
+        setLookupError("No customer found registered with this phone number.");
+      }
+    } catch (err) {
+      console.error("Quick lookup error:", err);
+      const detail = err.response?.data?.detail;
+      setLookupError(
+        typeof detail === "string"
+          ? detail
+          : detail?.message || "Customer not found."
+      );
+    } finally {
+      setLookupSearching(false);
+    }
+  }
+
+  function handleResetLookup() {
+    setLookupPhone("");
+    setLookupCustomerData(null);
+    setLookupError("");
   }
 
   // =====================================================
@@ -195,7 +246,7 @@ export default function AgentDashboard() {
   }
 
   return (
-    <div className="space-y-8 pb-10">
+    <div className="space-y-7 pb-10">
       {/* =====================================================
           TOP HEADER
       ===================================================== */}
@@ -238,14 +289,6 @@ export default function AgentDashboard() {
             />
             <span>{refreshing ? "Updating..." : "Refresh"}</span>
           </button>
-
-          <Link
-            to="/agent/deposit"
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#1249AD] to-[#0D3885] px-4 py-2 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition hover:from-[#0f3e94] hover:to-[#0a2c68] active:scale-95 md:text-sm"
-          >
-            <Banknote size={17} />
-            <span>Deposit Cash</span>
-          </Link>
         </div>
       </div>
 
@@ -283,7 +326,7 @@ export default function AgentDashboard() {
       ) : (
         <>
           {/* =====================================================
-              HERO: AGENT WALLET BALANCE CARD
+              HERO: AGENT WALLET FLOAT & COUNTER QUOTA
           ===================================================== */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0c2e6b] via-[#1249AD] to-[#1e5ecc] p-6 text-white shadow-xl shadow-blue-900/15 md:p-8">
             {/* Background decorative patterns */}
@@ -305,10 +348,15 @@ export default function AgentDashboard() {
                       <XCircle size={13} />
                       Wallet Frozen
                     </span>
+                  ) : walletBalance < 100 ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/30 px-2.5 py-0.5 text-xs font-bold text-amber-200 backdrop-blur-md border border-amber-400/30">
+                      <AlertTriangle size={13} />
+                      Low Float Warning
+                    </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/30 px-2.5 py-0.5 text-xs font-bold text-emerald-200 backdrop-blur-md border border-emerald-400/30">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-                      Ready for Deposits
+                      Active & Ready
                     </span>
                   )}
 
@@ -358,122 +406,75 @@ export default function AgentDashboard() {
                 </div>
 
                 <p className="max-w-xl text-xs leading-relaxed text-blue-100/90 md:text-sm">
-                  Total available fund allocated to your agent counter. Use this balance
-                  to execute instant cash deposits into customer bank accounts.
+                  Total available fund allocated to your counter float. Use this balance
+                  to execute cash deposits and customer operations.
                 </p>
               </div>
 
-              {/* Right Column: Quick Counter Action Buttons */}
-              <div className="flex flex-col gap-2.5 sm:flex-row lg:flex-col lg:min-w-[240px]">
-                <button
-                  type="button"
-                  onClick={() => navigate("/agent/deposit")}
-                  className="group flex items-center justify-between gap-3 rounded-2xl bg-white px-5 py-3.5 text-left font-bold text-slate-900 shadow-lg shadow-black/10 transition duration-200 hover:bg-blue-50 active:scale-98"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-600 text-white">
-                      <Banknote size={20} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-extrabold text-slate-900">
-                        Cash Deposit
-                      </p>
-                      <p className="text-[11px] font-medium text-slate-500">
-                        Top up customer account
-                      </p>
-                    </div>
-                  </div>
-                  <ArrowRight
-                    size={17}
-                    className="text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600"
-                  />
-                </button>
+              {/* Right Column: Counter Operational Quota Summary */}
+              <div className="flex flex-col justify-between rounded-2xl bg-white/10 p-5 backdrop-blur-md border border-white/15 lg:min-w-[300px]">
+                <div className="flex items-center justify-between pb-3 border-b border-white/15">
+                  <span className="text-xs font-bold uppercase tracking-wider text-blue-200">
+                    Daily Counter Quota
+                  </span>
+                  <span className="rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold text-white">
+                    {hasLimit ? `${limitUsedPercent}% Used` : "Unlimited"}
+                  </span>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => navigate("/agent/cash-payout")}
-                  className="group flex items-center justify-between gap-3 rounded-2xl bg-white/10 px-5 py-3.5 text-left font-bold text-white backdrop-blur-md transition duration-200 hover:bg-white/20 active:scale-98 border border-white/15"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
-                      <HandCoins size={20} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-extrabold text-white">
-                        Cash Payout
-                      </p>
-                      <p className="text-[11px] font-medium text-blue-100">
-                        Claim pickup code
-                      </p>
-                    </div>
+                <div className="py-3.5 space-y-2.5">
+                  <div className="flex justify-between items-baseline text-xs text-blue-100">
+                    <span className="text-blue-200">Processed Today:</span>
+                    <span className="font-extrabold text-white text-sm">
+                      ${todayAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
                   </div>
-                  <ArrowRight
-                    size={17}
-                    className="text-blue-200 transition group-hover:translate-x-1 group-hover:text-white"
-                  />
-                </button>
 
-                <button
-                  type="button"
-                  onClick={() => navigate("/agent/cash-transfer")}
-                  className="group flex items-center justify-between gap-3 rounded-2xl bg-white/10 px-5 py-3.5 text-left font-bold text-white backdrop-blur-md transition duration-200 hover:bg-white/20 active:scale-98 border border-white/15"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
-                      <ArrowRightLeft size={20} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-extrabold text-white">
-                        Cash Transfer
-                      </p>
-                      <p className="text-[11px] font-medium text-blue-100">
-                        Send to any phone
-                      </p>
+                  <div className="flex justify-between items-baseline text-xs text-blue-100">
+                    <span className="text-blue-200">Remaining Quota:</span>
+                    <span className="font-extrabold text-cyan-200 text-sm">
+                      {hasLimit
+                        ? `$${remainingLimit.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                        : "No Limit"}
+                    </span>
+                  </div>
+
+                  {/* Quota Progress Bar */}
+                  <div className="mt-1">
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-white/20">
+                      <div
+                        className="h-full rounded-full bg-cyan-300 transition-all duration-500"
+                        style={{ width: `${hasLimit ? limitUsedPercent : 100}%` }}
+                      />
                     </div>
                   </div>
-                  <ArrowRight
-                    size={17}
-                    className="text-blue-200 transition group-hover:translate-x-1 group-hover:text-white"
-                  />
-                </button>
+                </div>
+
+                <div className="pt-3 border-t border-white/15 flex items-center justify-between text-xs text-blue-100">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                    Counter Ready
+                  </span>
+                  <span className="font-mono text-cyan-200 font-semibold">{agentCode}</span>
+                </div>
               </div>
             </div>
 
             {/* Bottom info strip inside balance card */}
-            <div className="relative z-10 mt-6 pt-5 border-t border-white/15 grid grid-cols-2 gap-4 sm:grid-cols-3">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-200">
-                  Daily Deposit Limit
-                </p>
-                <p className="mt-0.5 text-base font-extrabold text-white">
-                  {hasLimit
-                    ? `$${dailyLimit.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
-                    : "No Limit"}
-                </p>
+            <div className="relative z-10 mt-6 pt-4 border-t border-white/15 flex flex-wrap items-center justify-between gap-3 text-xs text-blue-200 font-medium">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white">Counter Branch:</span>
+                <span>{branchName}</span>
               </div>
-
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-blue-200">
-                  Remaining Today
-                </p>
-                <p className="mt-0.5 text-base font-extrabold text-cyan-200">
-                  {hasLimit
-                    ? `$${remainingLimit.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
-                    : "Unlimited"}
-                </p>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white">Float Status:</span>
+                <span className={isWalletFrozen ? "text-red-300" : "text-emerald-300"}>
+                  {isWalletFrozen ? "Frozen / Restricted" : "Active & Operational"}
+                </span>
               </div>
-
-              <div className="col-span-2 sm:col-span-1">
-                <div className="flex items-center justify-between text-[11px] font-semibold text-blue-200">
-                  <span>Limit Usage</span>
-                  <span>{hasLimit ? `${limitUsedPercent}%` : "No Limit"}</span>
-                </div>
-                <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-white/20">
-                  <div
-                    className="h-full rounded-full bg-cyan-300 transition-all duration-500"
-                    style={{ width: hasLimit ? `${limitUsedPercent}%` : "100%" }}
-                  />
-                </div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white">Daily Deposit Cap:</span>
+                <span>{hasLimit ? `$${dailyLimit.toLocaleString()}` : "Unlimited"}</span>
               </div>
             </div>
           </div>
@@ -532,7 +533,7 @@ export default function AgentDashboard() {
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
                   {hasLimit
-                    ? `Out of $${dailyLimit.toLocaleString()} maximum`
+                    ? `Out of $${dailyLimit.toLocaleString()} cap`
                     : "No daily limit for deposits"}
                 </p>
               </div>
@@ -589,107 +590,196 @@ export default function AgentDashboard() {
           </div>
 
           {/* =====================================================
-              AGENT COUNTER QUICK SERVICES
+              COUNTER OPERATIONS & CUSTOMER VERIFICATION HUB
           ===================================================== */}
-          <div>
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-black tracking-tight text-slate-900">
-                  Agent Counter Services
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Direct shortcuts to perform counter financial operations
-                </p>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Quick Customer Lookup Tool (2 columns) */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <UserCheck className="text-[#1249AD]" size={20} />
+                    <h2 className="text-base font-black text-slate-900 md:text-lg">
+                      Quick Customer Verification
+                    </h2>
+                  </div>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    Verify account status, KYC tier, and name before accepting cash
+                  </p>
+                </div>
+                {lookupCustomerData && (
+                  <button
+                    type="button"
+                    onClick={handleResetLookup}
+                    className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+                  >
+                    <X size={14} />
+                    <span>Clear</span>
+                  </button>
+                )}
               </div>
+
+              {/* Search Form */}
+              <form onSubmit={handleQuickLookup} className="mt-4">
+                <div className="flex flex-col gap-2.5 sm:flex-row">
+                  <div className="relative flex-1">
+                    <Search
+                      size={17}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+                    <input
+                      type="text"
+                      value={lookupPhone}
+                      onChange={(e) => setLookupPhone(e.target.value)}
+                      placeholder="Enter customer phone (e.g. 098494201)"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:border-[#1249AD] focus:bg-white focus:ring-2 focus:ring-blue-100"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={lookupSearching || !lookupPhone.trim()}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#1249AD] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#0f3e94] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {lookupSearching ? (
+                      <>
+                        <RefreshCw size={15} className="animate-spin" />
+                        <span>Searching...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Search size={15} />
+                        <span>Verify Customer</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+
+              {/* Error Alert */}
+              {lookupError && (
+                <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs font-semibold text-amber-800">
+                  <AlertCircle size={16} className="shrink-0 text-amber-600" />
+                  <span>{lookupError}</span>
+                </div>
+              )}
+
+              {/* Customer Lookup Result Card */}
+              {lookupCustomerData ? (
+                <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/40 p-4.5">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3.5">
+                      <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#1249AD] font-bold text-lg text-white shadow-md shadow-blue-500/20">
+                        {lookupCustomerData.first_name?.charAt(0)?.toUpperCase() || "C"}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-extrabold text-slate-900 text-base">
+                            {lookupCustomerData.first_name} {lookupCustomerData.last_name}
+                          </h3>
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
+                            <CheckCircle2 size={11} className="text-emerald-500" />
+                            {lookupCustomerData.kyc_status === "approved"
+                              ? "KYC Verified"
+                              : lookupCustomerData.kyc_status || "Active"}
+                          </span>
+                        </div>
+                        <p className="mt-0.5 font-mono text-xs text-slate-600">
+                          {lookupCustomerData.phone_number}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                          Current Balance
+                        </p>
+                        <p className="text-base font-extrabold text-slate-900">
+                          ${Number(lookupCustomerData.balance || 0).toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/agent/deposit?phone=${encodeURIComponent(
+                              lookupCustomerData.phone_number
+                            )}`
+                          )
+                        }
+                        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#1249AD] to-[#0D3885] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition hover:from-[#0f3e94] hover:to-[#0a2c68] active:scale-95"
+                      >
+                        <Banknote size={15} />
+                        <span>Proceed to Deposit</span>
+                        <ArrowRight size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : !lookupError && (
+                <div className="mt-4 flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 text-xs text-slate-500">
+                  <ShieldCheck size={18} className="shrink-0 text-slate-400" />
+                  <span>
+                    Quickly verify customer registration and KYC status before handling cash.
+                    Enter their phone number above to get started.
+                  </span>
+                </div>
+              )}
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              {/* Card 1: Deposit */}
-              <Link
-                to="/agent/deposit"
-                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-[#1249AD]/40 hover:shadow-lg hover:shadow-blue-500/5"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-50 text-[#1249AD] transition group-hover:bg-[#1249AD] group-hover:text-white">
-                      <Banknote size={24} />
-                    </div>
-                    <ArrowUpRight
-                      size={20}
-                      className="text-slate-300 transition group-hover:text-[#1249AD] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
+            {/* Counter Guidelines & Security Notice (1 column) */}
+            <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div>
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="text-emerald-600" size={19} />
+                    <h3 className="font-bold text-slate-900 text-sm">
+                      Counter Security Policy
+                    </h3>
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-slate-900 group-hover:text-[#1249AD]">
-                    Customer Cash Deposit
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                    Search customer by phone and deposit funds directly into their
-                    verified KhmerPay account.
-                  </p>
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                    SOP
+                  </span>
                 </div>
-                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-[#1249AD]">
-                  <span>Proceed to deposit</span>
-                  <ArrowRight size={14} className="transition group-hover:translate-x-1" />
-                </div>
-              </Link>
 
-              {/* Card 2: Cash Transfer */}
-              <Link
-                to="/agent/cash-transfer"
-                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/5"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-cyan-50 text-cyan-600 transition group-hover:bg-cyan-600 group-hover:text-white">
-                      <ArrowRightLeft size={24} />
-                    </div>
-                    <ArrowUpRight
-                      size={20}
-                      className="text-slate-300 transition group-hover:text-cyan-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
+                <div className="mt-4 space-y-3 text-xs leading-relaxed text-slate-600">
+                  <div className="flex items-start gap-2.5">
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-blue-50 text-[11px] font-bold text-[#1249AD]">
+                      1
+                    </span>
+                    <span>
+                      Count and inspect physical banknotes for authenticity prior to confirming.
+                    </span>
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-slate-900 group-hover:text-cyan-700">
-                    Agent Cash Transfer
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                    Send cash from sender to recipient with an instant pickup code
-                    redeemable at any agent counter.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-cyan-700">
-                  <span>Send transfer</span>
-                  <ArrowRight size={14} className="transition group-hover:translate-x-1" />
-                </div>
-              </Link>
 
-              {/* Card 3: Cash Payout */}
-              <Link
-                to="/agent/cash-payout"
-                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/5"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-600 transition group-hover:bg-emerald-600 group-hover:text-white">
-                      <HandCoins size={24} />
-                    </div>
-                    <ArrowUpRight
-                      size={20}
-                      className="text-slate-300 transition group-hover:text-emerald-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
+                  <div className="flex items-start gap-2.5">
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-blue-50 text-[11px] font-bold text-[#1249AD]">
+                      2
+                    </span>
+                    <span>
+                      Confirm customer full name and registered phone number before disbursing funds.
+                    </span>
                   </div>
-                  <h3 className="mt-4 text-base font-bold text-slate-900 group-hover:text-emerald-700">
-                    Cash Pickup & Payout
-                  </h3>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                    Verify customer pickup code and disburse physical cash to the
-                    designated recipient safely.
-                  </p>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-blue-50 text-[11px] font-bold text-[#1249AD]">
+                      3
+                    </span>
+                    <span>
+                      For cash payouts, verify government photo ID against the pickup code holder.
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-4 flex items-center gap-1.5 text-xs font-bold text-emerald-700">
-                  <span>Disburse cash</span>
-                  <ArrowRight size={14} className="transition group-hover:translate-x-1" />
-                </div>
-              </Link>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <span className="font-medium">Need float top-up?</span>
+                <span className="font-semibold text-[#1249AD]">Contact Branch Admin</span>
+              </div>
             </div>
           </div>
 
@@ -774,11 +864,11 @@ export default function AgentDashboard() {
 
             {/* Table Content */}
             {filteredTransactions.length === 0 ? (
-              <div className="flex min-h-[260px] flex-col items-center justify-center p-8 text-center">
-                <div className="grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-slate-400">
-                  <ReceiptText size={26} />
+              <div className="flex min-h-[220px] flex-col items-center justify-center p-8 text-center">
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-slate-100 text-slate-400">
+                  <ReceiptText size={24} />
                 </div>
-                <h3 className="mt-4 font-bold text-slate-800">
+                <h3 className="mt-3 font-bold text-slate-800 text-sm">
                   {searchQuery ? "No matching transactions" : "No recent deposits yet"}
                 </h3>
                 <p className="mt-1 max-w-sm text-xs text-slate-500">
@@ -786,22 +876,14 @@ export default function AgentDashboard() {
                     ? `No transactions matched "${searchQuery}". Clear your search to see all recent deposits.`
                     : "When you complete customer deposits or transfers, they will automatically appear here."}
                 </p>
-                {searchQuery ? (
+                {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="mt-4 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
+                    className="mt-3 rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50"
                   >
                     Clear Filter
                   </button>
-                ) : (
-                  <Link
-                    to="/agent/deposit"
-                    className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#1249AD] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#0f3e94]"
-                  >
-                    <Banknote size={15} />
-                    <span>Make First Deposit</span>
-                  </Link>
                 )}
               </div>
             ) : (
@@ -896,25 +978,6 @@ export default function AgentDashboard() {
                 </table>
               </div>
             )}
-          </div>
-
-          {/* =====================================================
-              AGENT COUNTER GUIDELINES & HELPFUL TIPS
-          ===================================================== */}
-          <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-5 text-xs text-slate-600">
-            <div className="flex items-start gap-3">
-              <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-blue-600 text-white shadow-sm">
-                <ShieldCheck size={18} />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-bold text-slate-900">
-                  Agent Counter Security & Compliance Notice
-                </h4>
-                <p className="leading-relaxed text-slate-600">
-                  Always count cash received before authorizing a customer deposit. Confirm the customer's full name and registered phone number prior to confirming the transaction.
-                </p>
-              </div>
-            </div>
           </div>
         </>
       )}

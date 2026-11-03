@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_banking_app/app/app_color.dart';
+import 'package:mobile_banking_app/app/app_text.dart';
 import 'package:mobile_banking_app/app/routes/app_route.dart';
 import 'package:mobile_banking_app/screen/auth/register/register_controller.dart';
 
@@ -9,8 +11,7 @@ class RegisterView extends GetView<RegisterViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
-      
+      backgroundColor: AppColor.scaffoldBackground,
       body: SafeArea(
         child: Center(
           child: Form(
@@ -23,25 +24,24 @@ class RegisterView extends GetView<RegisterViewController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  
                   Image.asset(
                     'lib/app/assets/images/logo.png',
                     width: 200,
                     height: 200,
                   ),
                   const SizedBox(height: 10),
-          
+
                   Text(
                     'Create your account to start using mobile banking.',
-                    style: TextStyle(
-                      fontSize: 15,
+                    textAlign: TextAlign.center,
+                    style: AppText.bodyMedium.copyWith(
+                      color: AppColor.textSecondary,
                       height: 1.5,
-                      color: Colors.grey.shade600,
                     ),
                   ),
-          
+
                   const SizedBox(height: 30),
-          
+
                   _buildField(
                     controller: controller.firstNameController,
                     label: 'First Name',
@@ -54,9 +54,9 @@ class RegisterView extends GetView<RegisterViewController> {
                       );
                     },
                   ),
-          
+
                   const SizedBox(height: 18),
-          
+
                   _buildField(
                     controller: controller.lastNameController,
                     label: 'Last Name',
@@ -69,9 +69,9 @@ class RegisterView extends GetView<RegisterViewController> {
                       );
                     },
                   ),
-          
+
                   const SizedBox(height: 18),
-          
+
                   _buildField(
                     controller: controller.phoneController,
                     label: 'Phone Number',
@@ -80,15 +80,16 @@ class RegisterView extends GetView<RegisterViewController> {
                     keyboardType: TextInputType.phone,
                     validator: controller.validatePhone,
                   ),
-          
+
                   const SizedBox(height: 18),
-          
+
                   Obx(
                     () => TextFormField(
                       controller: controller.pinController,
                       obscureText: controller.isPinHidden.value,
                       keyboardType: TextInputType.number,
                       textInputAction: TextInputAction.done,
+                      style: AppText.bodyMedium.copyWith(color: AppColor.textPrimary),
                       decoration: _inputDecoration(
                         label: 'PIN',
                         hint: 'Create your PIN',
@@ -100,6 +101,7 @@ class RegisterView extends GetView<RegisterViewController> {
                             controller.isPinHidden.value
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
+                            color: AppColor.textSecondary,
                           ),
                         ),
                       ),
@@ -111,9 +113,9 @@ class RegisterView extends GetView<RegisterViewController> {
                       },
                     ),
                   ),
-          
+
                   const SizedBox(height: 30),
-          
+
                   Obx(
                     () => SizedBox(
                       width: double.infinity,
@@ -123,10 +125,9 @@ class RegisterView extends GetView<RegisterViewController> {
                             ? null
                             : controller.register,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue.shade700,
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor:
-                              Colors.blue.shade300,
+                          backgroundColor: AppColor.secondaryColor,
+                          foregroundColor: AppColor.white,
+                          disabledBackgroundColor: AppColor.secondaryColor.withValues(alpha: 0.4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -138,30 +139,28 @@ class RegisterView extends GetView<RegisterViewController> {
                                 height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  color: Colors.white,
+                                  color: AppColor.white,
                                 ),
                               )
-                            : const Text(
+                            : Text(
                                 'Create Account',
-                                style: TextStyle(
-                                  fontSize: 16,
+                                style: AppText.bodyLarge.copyWith(
+                                  color: AppColor.white,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                       ),
                     ),
                   ),
-          
+
                   const SizedBox(height: 26),
-          
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'Already have an account?',
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                        ),
+                        style: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
                       ),
                       TextButton(
                         onPressed: () {
@@ -171,8 +170,8 @@ class RegisterView extends GetView<RegisterViewController> {
                         },
                         child: Text(
                           'Sign In',
-                          style: TextStyle(
-                            color: Colors.blue.shade700,
+                          style: AppText.bodyMedium.copyWith(
+                            color: AppColor.secondaryColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -200,6 +199,7 @@ class RegisterView extends GetView<RegisterViewController> {
       controller: controller,
       keyboardType: keyboardType,
       textInputAction: TextInputAction.next,
+      style: AppText.bodyMedium.copyWith(color: AppColor.textPrimary),
       decoration: _inputDecoration(
         label: label,
         hint: hint,
@@ -216,10 +216,12 @@ class RegisterView extends GetView<RegisterViewController> {
   }) {
     return InputDecoration(
       labelText: label,
+      labelStyle: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
       hintText: hint,
-      prefixIcon: Icon(icon),
+      hintStyle: AppText.bodyMedium.copyWith(color: AppColor.textHint),
+      prefixIcon: Icon(icon, color: AppColor.secondaryColor),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: AppColor.white,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 18,
@@ -230,27 +232,27 @@ class RegisterView extends GetView<RegisterViewController> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(
-          color: Colors.grey.shade300,
+        borderSide: const BorderSide(
+          color: AppColor.background,
         ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(
-          color: Colors.blue.shade700,
+        borderSide: const BorderSide(
+          color: AppColor.secondaryColor,
           width: 1.5,
         ),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(
-          color: Colors.red,
+          color: AppColor.red,
         ),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(
-          color: Colors.red,
+          color: AppColor.red,
           width: 1.5,
         ),
       ),

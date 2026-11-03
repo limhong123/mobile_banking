@@ -1,189 +1,103 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:mobile_banking_app/app/app_color.dart';
+import 'package:mobile_banking_app/app/app_text.dart';
 import 'package:mobile_banking_app/screen/kyc/result/result_controller.dart';
 
-
-class ResultView
-    extends GetView<ResultController> {
+class ResultView extends GetView<ResultController> {
   const ResultView({
     super.key,
   });
-
-
-  static const Color primaryColor =
-      Color(
-    0xFF1249AD,
-  );
-
-
-  static const Color secondaryColor =
-      Color(
-    0xFF7AC40B,
-  );
-
 
   @override
   Widget build(
     BuildContext context,
   ) {
     return Scaffold(
-      backgroundColor:
-          const Color(
-        0xFFF7F9FD,
-      ),
-
+      backgroundColor: AppColor.scaffoldBackground,
       body: SafeArea(
         child: Obx(
           () => Padding(
-            padding:
-                const EdgeInsets.all(
+            padding: const EdgeInsets.all(
               24,
             ),
-
             child: Column(
               children: [
-
                 const Spacer(),
-
 
                 _statusIcon(),
 
-
                 const SizedBox(
-                  height:
-                      28,
+                  height: 28,
                 ),
-
 
                 Text(
                   controller.title,
-
-                  textAlign:
-                      TextAlign.center,
-
-                  style:
-                      const TextStyle(
-                    fontSize:
-                        28,
-
-                    fontWeight:
-                        FontWeight.w800,
+                  textAlign: TextAlign.center,
+                  style: AppText.h2.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: AppColor.textPrimary,
                   ),
                 ),
-
 
                 const SizedBox(
-                  height:
-                      14,
+                  height: 14,
                 ),
-
 
                 Text(
-                  controller
-                      .description,
-
-                  textAlign:
-                      TextAlign.center,
-
-                  style:
-                      TextStyle(
-                    fontSize:
-                        16,
-
-                    height:
-                        1.6,
-
-                    color:
-                        Colors.grey
-                            .shade600,
+                  controller.description,
+                  textAlign: TextAlign.center,
+                  style: AppText.bodyMedium.copyWith(
+                    height: 1.6,
+                    color: AppColor.textSecondary,
                   ),
                 ),
 
-
-                if (
-                    controller
-                            .matchScore
-                            .value >
-                        0) ...[
-
+                if (controller.matchScore.value > 0) ...[
                   const SizedBox(
-                    height:
-                        22,
+                    height: 22,
                   ),
-
-
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(
-                      horizontal:
-                          20,
-
-                      vertical:
-                          12,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
                     ),
-
-                    decoration:
-                        BoxDecoration(
-                      color:
-                          Colors.white,
-
-                      borderRadius:
-                          BorderRadius.circular(
+                    decoration: BoxDecoration(
+                      color: AppColor.white,
+                      borderRadius: BorderRadius.circular(
                         16,
                       ),
-
-                      border:
-                          Border.all(
-                        color:
-                            Colors.grey
-                                .shade200,
+                      border: Border.all(
+                        color: AppColor.background,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColor.shadow,
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-
-                    child:
-                        Column(
+                    child: Column(
                       children: [
-
                         Text(
                           'Face Match Score',
-
-                          style:
-                              TextStyle(
-                            color:
-                                Colors.grey
-                                    .shade500,
-
-                            fontSize:
-                                13,
+                          style: AppText.labelSmall.copyWith(
+                            color: AppColor.textHint,
                           ),
                         ),
-
-
                         const SizedBox(
-                          height:
-                              4,
+                          height: 4,
                         ),
-
-
                         Text(
-                          controller
-                              .matchScore
-                              .value
-                              .toStringAsFixed(
+                          controller.matchScore.value.toStringAsFixed(
                             2,
                           ),
-
-                          style:
-                              const TextStyle(
-                            fontSize:
-                                22,
-
-                            fontWeight:
-                                FontWeight.w800,
+                          style: AppText.h3.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: AppColor.textPrimary,
                           ),
                         ),
-
                       ],
                     ),
                   ),
@@ -197,24 +111,30 @@ class ResultView
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColor.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(color: AppColor.background),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColor.shadow,
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            Icon(Icons.badge_outlined,
-                                size: 18, color: primaryColor),
-                            SizedBox(width: 8),
+                            const Icon(Icons.badge_outlined,
+                                size: 18, color: AppColor.secondaryColor),
+                            const SizedBox(width: 8),
                             Text(
                               'Identity Information',
-                              style: TextStyle(
-                                fontSize: 14,
+                              style: AppText.bodyLarge.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF172033),
+                                color: AppColor.textPrimary,
                               ),
                             ),
                           ],
@@ -226,31 +146,29 @@ class ResultView
                                 MainAxisAlignment.spaceBetween,
                             children: [
                               Text('NID Number',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 13)),
+                                  style: AppText.bodySmall.copyWith(
+                                      color: AppColor.textSecondary)),
                               Text(controller.nidNumber.value,
-                                  style: const TextStyle(
+                                  style: AppText.bodyMedium.copyWith(
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 14)),
+                                      color: AppColor.textPrimary)),
                             ],
                           ),
                         if (controller.nidNumber.value.isNotEmpty &&
                             controller.fullName.value.isNotEmpty)
-                          const Divider(height: 16),
+                          const Divider(height: 16, color: AppColor.background),
                         if (controller.fullName.value.isNotEmpty)
                           Row(
                             mainAxisAlignment:
                                 MainAxisAlignment.spaceBetween,
                             children: [
                               Text('Name on NID',
-                                  style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 13)),
+                                  style: AppText.bodySmall.copyWith(
+                                      color: AppColor.textSecondary)),
                               Text(controller.fullName.value,
-                                  style: const TextStyle(
+                                  style: AppText.bodyMedium.copyWith(
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 14)),
+                                      color: AppColor.textPrimary)),
                             ],
                           ),
                       ],
@@ -260,61 +178,37 @@ class ResultView
 
                 const Spacer(),
 
-
                 // =================================================
                 // APPROVED
                 // =================================================
 
-                if (
-                    controller
-                        .isApproved)
+                if (controller.isApproved)
                   ElevatedButton.icon(
-                    onPressed:
-                        controller
-                            .goToLogin,
-
-                    icon:
-                        const Icon(
-                      Icons
-                          .login_rounded,
+                    onPressed: controller.goToLogin,
+                    icon: const Icon(
+                      Icons.login_rounded,
                     ),
-
-                    style:
-                        ElevatedButton
-                            .styleFrom(
-                      minimumSize:
-                          const Size(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(
                         double.infinity,
                         54,
                       ),
-
-                      backgroundColor:
-                          primaryColor,
-
-                      foregroundColor:
-                          Colors.white,
-
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(
+                      backgroundColor: AppColor.secondaryColor,
+                      foregroundColor: AppColor.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
                           14,
                         ),
                       ),
                     ),
-
-                    label:
-                        const Text(
+                    label: Text(
                       'ទៅកាន់ Login',
-
-                      style:
-                          TextStyle(
-                        fontWeight:
-                            FontWeight.w700,
+                      style: AppText.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.white,
                       ),
                     ),
                   )
-
 
                 // =================================================
                 // REJECTED
@@ -322,52 +216,31 @@ class ResultView
 
                 else
                   ElevatedButton.icon(
-                    onPressed:
-                        controller
-                            .retryVerification,
-
-                    icon:
-                        const Icon(
-                      Icons
-                          .refresh_rounded,
+                    onPressed: controller.retryVerification,
+                    icon: const Icon(
+                      Icons.refresh_rounded,
                     ),
-
-                    style:
-                        ElevatedButton
-                            .styleFrom(
-                      minimumSize:
-                          const Size(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(
                         double.infinity,
                         54,
                       ),
-
-                      backgroundColor:
-                          primaryColor,
-
-                      foregroundColor:
-                          Colors.white,
-
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(
+                      backgroundColor: AppColor.secondaryColor,
+                      foregroundColor: AppColor.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
                           14,
                         ),
                       ),
                     ),
-
-                    label:
-                        const Text(
+                    label: Text(
                       'ធ្វើ KYC ម្តងទៀត',
-
-                      style:
-                          TextStyle(
-                        fontWeight:
-                            FontWeight.w700,
+                      style: AppText.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.white,
                       ),
                     ),
                   ),
-
               ],
             ),
           ),
@@ -376,42 +249,25 @@ class ResultView
     );
   }
 
-
   Widget _statusIcon() {
-    if (
-        controller
-            .isApproved) {
+    if (controller.isApproved) {
       return _circleIcon(
-        icon:
-            Icons.check_rounded,
-
-        background:
-            secondaryColor
-                .withOpacity(
-          0.14,
+        icon: Icons.check_rounded,
+        background: AppColor.primaryColor.withValues(
+          alpha: 0.14,
         ),
-
-        foreground:
-            secondaryColor,
+        foreground: AppColor.primaryColor,
       );
     }
 
-
     return _circleIcon(
-      icon:
-          Icons.close_rounded,
-
-      background:
-          Colors.red
-              .withOpacity(
-        0.12,
+      icon: Icons.close_rounded,
+      background: AppColor.red.withValues(
+        alpha: 0.12,
       ),
-
-      foreground:
-          Colors.red,
+      foreground: AppColor.red,
     );
   }
-
 
   Widget _circleIcon({
     required IconData icon,
@@ -419,30 +275,16 @@ class ResultView
     required Color foreground,
   }) {
     return Container(
-      width:
-          120,
-
-      height:
-          120,
-
-      decoration:
-          BoxDecoration(
-        color:
-            background,
-
-        shape:
-            BoxShape.circle,
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        color: background,
+        shape: BoxShape.circle,
       ),
-
-      child:
-          Icon(
+      child: Icon(
         icon,
-
-        size:
-            62,
-
-        color:
-            foreground,
+        size: 62,
+        color: foreground,
       ),
     );
   }

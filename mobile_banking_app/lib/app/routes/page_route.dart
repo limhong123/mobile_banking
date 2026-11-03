@@ -27,6 +27,8 @@ import 'package:mobile_banking_app/screen/payment/my_qr/my_qr_view.dart';
 import 'package:mobile_banking_app/screen/payment/send/send_binding.dart';
 import 'package:mobile_banking_app/screen/payment/send/send_view.dart';
 import 'package:mobile_banking_app/screen/profile/profile_view.dart';
+import 'package:mobile_banking_app/screen/saving/saving_binding.dart';
+import 'package:mobile_banking_app/screen/saving/saving_view.dart';
 import 'package:mobile_banking_app/screen/scan_qr/scan_qr_binding.dart';
 import 'package:mobile_banking_app/screen/scan_qr/scan_qr_view.dart';
 import 'package:mobile_banking_app/screen/transaction_detail/transaction_detail_binding.dart';
@@ -137,6 +139,11 @@ abstract class AppPages {
       name: AppRoutes.transactionDetail,
       page: () => TransactionDetailView(transactionId: '',),
       binding: TransactionDetailViewBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.saving,
+      page: () => const SavingView(),
+      binding: SavingBinding(),
     ),
     GetPage(
   name:

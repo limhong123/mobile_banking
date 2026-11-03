@@ -66,7 +66,7 @@ class Config {
 
   final GetStorage box = GetStorage();
 
-  static const String computerIp = '192.168.100.138';
+  static const String computerIp = '172.26.176.1';
 
   String get baseUrl {
     if (kIsWeb) {

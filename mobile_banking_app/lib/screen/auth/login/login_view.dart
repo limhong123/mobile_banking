@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:mobile_banking_app/app/app_color.dart';
+import 'package:mobile_banking_app/app/app_text.dart';
 import 'package:mobile_banking_app/app/routes/app_route.dart';
 import 'package:mobile_banking_app/screen/auth/login/login_controller.dart';
 
@@ -10,7 +12,7 @@ class LoginView extends GetView<LoginViewController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppColor.scaffoldBackground,
       body: SafeArea(
         child: Center(
           child: Form(
@@ -32,10 +34,10 @@ class LoginView extends GetView<LoginViewController> {
 
                   Text(
                     'Sign in to continue to your mobile banking account.',
-                    style: TextStyle(
-                      fontSize: 15,
+                    textAlign: TextAlign.center,
+                    style: AppText.bodyMedium.copyWith(
+                      color: AppColor.textSecondary,
                       height: 1.5,
-                      color: Colors.grey.shade600,
                     ),
                   ),
 
@@ -45,24 +47,27 @@ class LoginView extends GetView<LoginViewController> {
                     controller: controller.phoneController,
                     keyboardType: TextInputType.phone,
                     textInputAction: TextInputAction.next,
+                    style: AppText.bodyMedium.copyWith(color: AppColor.textPrimary),
                     decoration: InputDecoration(
                       labelText: 'Phone Number',
+                      labelStyle: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
                       hintText: 'Enter your phone number',
-                      prefixIcon: const Icon(Icons.phone_outlined),
+                      hintStyle: AppText.bodyMedium.copyWith(color: AppColor.textHint),
+                      prefixIcon: const Icon(Icons.phone_outlined, color: AppColor.secondaryColor),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: AppColor.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
+                        borderSide: const BorderSide(color: AppColor.background),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide(
-                          color: Colors.blue.shade700,
+                        borderSide: const BorderSide(
+                          color: AppColor.secondaryColor,
                           width: 1.5,
                         ),
                       ),
@@ -78,35 +83,39 @@ class LoginView extends GetView<LoginViewController> {
                       obscureText: controller.isPinHidden.value,
                       keyboardType: TextInputType.number,
                       inputFormatters: [
-    LengthLimitingTextInputFormatter(6),
-  ],
+                        LengthLimitingTextInputFormatter(6),
+                      ],
                       textInputAction: TextInputAction.done,
+                      style: AppText.bodyMedium.copyWith(color: AppColor.textPrimary),
                       decoration: InputDecoration(
                         labelText: 'PIN',
+                        labelStyle: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
                         hintText: 'Enter your PIN',
-                        prefixIcon: const Icon(Icons.lock_outline_rounded),
+                        hintStyle: AppText.bodyMedium.copyWith(color: AppColor.textHint),
+                        prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColor.secondaryColor),
                         suffixIcon: IconButton(
                           onPressed: controller.togglePinVisibility,
                           icon: Icon(
                             controller.isPinHidden.value
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
+                            color: AppColor.textSecondary,
                           ),
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColor.white,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
                           borderSide: BorderSide.none,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderSide: const BorderSide(color: AppColor.background),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide(
-                            color: Colors.blue.shade700,
+                          borderSide: const BorderSide(
+                            color: AppColor.secondaryColor,
                             width: 1.5,
                           ),
                         ),
@@ -131,9 +140,9 @@ class LoginView extends GetView<LoginViewController> {
                             ? null
                             : controller.login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue.shade700,
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor: Colors.blue.shade300,
+                          backgroundColor: AppColor.secondaryColor,
+                          foregroundColor: AppColor.white,
+                          disabledBackgroundColor: AppColor.secondaryColor.withValues(alpha: 0.4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -145,13 +154,13 @@ class LoginView extends GetView<LoginViewController> {
                                 height: 22,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2.5,
-                                  color: Colors.white,
+                                  color: AppColor.white,
                                 ),
                               )
-                            : const Text(
+                            : Text(
                                 'Sign In',
-                                style: TextStyle(
-                                  fontSize: 16,
+                                style: AppText.bodyLarge.copyWith(
+                                  color: AppColor.white,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -166,7 +175,7 @@ class LoginView extends GetView<LoginViewController> {
                     children: [
                       Text(
                         "Don't have an account?",
-                        style: TextStyle(color: Colors.grey.shade600),
+                        style: AppText.bodyMedium.copyWith(color: AppColor.textSecondary),
                       ),
                       TextButton(
                         onPressed: () {
@@ -174,8 +183,8 @@ class LoginView extends GetView<LoginViewController> {
                         },
                         child: Text(
                           'Create Account',
-                          style: TextStyle(
-                            color: Colors.blue.shade700,
+                          style: AppText.bodyMedium.copyWith(
+                            color: AppColor.secondaryColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),

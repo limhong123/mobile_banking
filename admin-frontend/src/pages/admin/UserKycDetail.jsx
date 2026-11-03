@@ -12,10 +12,7 @@ import {
   ScanFace,
   User,
   Wallet,
-  SlidersHorizontal,
 } from "lucide-react";
-
-import BalanceAdjustmentModal from "../../components/BalanceAdjustmentModal";
 
 import {
   useNavigate,
@@ -51,11 +48,6 @@ export default function UserKycDetail() {
     error,
     setError,
   ] = useState("");
-
-  const [
-    adjustOpen,
-    setAdjustOpen,
-  ] = useState(false);
 
 
   // =====================================================
@@ -486,43 +478,32 @@ export default function UserKycDetail() {
 
         {/* HEADER */}
 
-        <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <button
-              type="button"
-              onClick={() =>
-                navigate(
-                  "/admin/users"
-                )
-              }
-              className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-blue-600"
-            >
-              <ArrowLeft
-                size={17}
-              />
-
-              Back to Users
-            </button>
-
-
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-              Customer Detail & KYC
-            </h1>
-
-
-            <p className="mt-1 text-sm text-slate-500">
-              Manage wallet balance, NID and biometric verification
-            </p>
-          </div>
-
+        <div className="mb-7">
           <button
             type="button"
-            onClick={() => setAdjustOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/20 transition hover:bg-emerald-700"
+            onClick={() =>
+              navigate(
+                "/admin/users"
+              )
+            }
+            className="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-blue-600"
           >
-            <SlidersHorizontal size={16} />
-            Debit / Credit Balance
+            <ArrowLeft
+              size={17}
+            />
+
+            Back to Users
           </button>
+
+
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+            Customer Detail & KYC
+          </h1>
+
+
+          <p className="mt-1 text-sm text-slate-500">
+            Verify customer NID and biometric results
+          </p>
         </div>
 
 
@@ -837,22 +818,6 @@ export default function UserKycDetail() {
           </div>
 
         </div>
-
-        {user && (
-          <BalanceAdjustmentModal
-            isOpen={adjustOpen}
-            onClose={() => setAdjustOpen(false)}
-            target={{
-              id: user.id || id,
-              name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || "Customer",
-              phone: user.phone_number,
-              balance: user.balance,
-              currency: user.currency || "USD",
-              type: "user",
-            }}
-            onSuccess={loadUser}
-          />
-        )}
 
       </>
   );

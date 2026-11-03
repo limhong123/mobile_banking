@@ -1,9 +1,11 @@
 part of 'scan_khqr_view.dart';
 
 class ScanKhqrViewController extends GetxController {
+  void goToScanner() {
+    Get.toNamed(AppRoutes.scanQr);
+  }
 
-  @override
-  void onInit() {
-    super.onInit();
+  void goToMyQr() {
+    Get.toNamed(AppRoutes.myQr);
   }
 }

@@ -14,112 +14,96 @@ class AnalysDateView extends GetView<AnalysDateController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF6F7F9),
+      backgroundColor: AppColor.scaffoldBackground,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColor.white,
+        surfaceTintColor: AppColor.white,
         elevation: 0,
         centerTitle: true,
-        title:  Text(
+        title: Text(
           'ចំណូល និង ចំណាយ',
           style: AppText.h4.copyWith(
-            color: Colors.black,
+            color: AppColor.textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-     body: Obx(
-  () {
-    if (controller.isLoading.value) {
-      return const Center(
-        child:
-            CircularProgressIndicator(),
-      );
-    }
+      body: Obx(
+        () {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(color: AppColor.secondaryColor),
+            );
+          }
 
-    if (controller
-        .errorMessage
-        .value
-        .isNotEmpty) {
-      return Center(
-        child: Padding(
-          padding:
-              const EdgeInsets.all(
-            24,
-          ),
-          child: Column(
-            mainAxisSize:
-                MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.error_outline,
-                size: 50,
-                color: Colors.redAccent,
-              ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              Text(
-                controller
-                    .errorMessage
-                    .value,
-                textAlign:
-                    TextAlign.center,
-              ),
-
-              const SizedBox(
-                height: 16,
-              ),
-
-              ElevatedButton(
-                onPressed: () {
-                  controller
-                      .refreshData();
-                },
-                child:
-                    const Text(
-                  'ព្យាយាមម្តងទៀត',
+          if (controller.errorMessage.value.isNotEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(
+                  24,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 50,
+                      color: AppColor.red,
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      controller.errorMessage.value,
+                      textAlign: TextAlign.center,
+                      style: AppText.bodyMedium.copyWith(color: AppColor.textPrimary),
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        controller.refreshData();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColor.secondaryColor,
+                        foregroundColor: AppColor.white,
+                      ),
+                      child: const Text(
+                        'ព្យាយាមម្តងទៀត',
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      );
-    }
+            );
+          }
 
-    return RefreshIndicator(
-      onRefresh:
-          controller.refreshData,
-      child:
-          SingleChildScrollView(
-        physics:
-            const AlwaysScrollableScrollPhysics(),
-        padding:
-            const EdgeInsets.all(
-          16,
-        ),
-        child: Column(
-          children: [
-            _filterSection(),
-
-            const SizedBox(
-              height: 20,
+          return RefreshIndicator(
+            onRefresh: controller.refreshData,
+            color: AppColor.secondaryColor,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(
+                16,
+              ),
+              child: Column(
+                children: [
+                  _filterSection(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  _chartCard(),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  _summarySection(),
+                ],
+              ),
             ),
-
-            _chartCard(),
-
-            const SizedBox(
-              height: 16,
-            ),
-
-            _summarySection(),
-          ],
-        ),
+          );
+        },
       ),
-    );
-  },
-),
     );
   }
 
@@ -127,8 +111,15 @@ class AnalysDateView extends GetView<AnalysDateController> {
     return Container(
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColor.white,
         borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: AppColor.shadow,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -175,7 +166,7 @@ class AnalysDateView extends GetView<AnalysDateController> {
           decoration: BoxDecoration(
             color: isSelected
                 ? AppColor.primaryColor
-                : Colors.transparent,
+                : AppColor.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Center(
@@ -185,8 +176,8 @@ class AnalysDateView extends GetView<AnalysDateController> {
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: isSelected
-                    ? Colors.white
-                    : Colors.grey.shade600,
+                    ? AppColor.white
+                    : AppColor.textSecondary,
               ),
             ),
           ),
@@ -200,35 +191,39 @@ class AnalysDateView extends GetView<AnalysDateController> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColor.white,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColor.shadow,
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Text(
+              Text(
                 'សង្ខេបប្រតិបត្តិការ',
                 style: AppText.bodyLarge.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: AppColor.textPrimary,
                 ),
               ),
-
               Text(
                 _currentFilterName(),
                 style: AppText.bodyMedium.copyWith(
-                  color: Colors.grey.shade500,
+                  color: AppColor.textHint,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 25),
-
           SizedBox(
             height: 230,
             child: Stack(
@@ -241,23 +236,20 @@ class AnalysDateView extends GetView<AnalysDateController> {
                     startDegreeOffset: -90,
                     sections: [
                       PieChartSectionData(
-                        value:
-                            controller.income.value,
-                        color: Colors.green,
+                        value: controller.income.value,
+                        color: AppColor.primaryColor,
                         radius: 38,
                         showTitle: false,
                       ),
                       PieChartSectionData(
-                        value:
-                            controller.expense.value,
-                        color: Colors.redAccent,
+                        value: controller.expense.value,
+                        color: AppColor.red,
                         radius: 38,
                         showTitle: false,
                       ),
                     ],
                   ),
                 ),
-
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -265,17 +257,16 @@ class AnalysDateView extends GetView<AnalysDateController> {
                       'សរុប',
                       style: AppText.h4.copyWith(
                         fontSize: 13,
-                        color: Colors.grey.shade500,
+                        color: AppColor.secondaryColor,
                       ),
                     ),
-
                     const SizedBox(height: 5),
-
                     Text(
                       '\$${controller.total.toStringAsFixed(2)}',
-                      style:  AppText.h4.copyWith(
+                      style: AppText.h4.copyWith(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: AppColor.textPrimary,
                       ),
                     ),
                   ],
@@ -283,22 +274,17 @@ class AnalysDateView extends GetView<AnalysDateController> {
               ],
             ),
           ),
-
           const SizedBox(height: 15),
-
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _legend(
-                color: Colors.green,
+                color: AppColor.primaryColor,
                 text: 'ចំណូល',
               ),
-
               const SizedBox(width: 30),
-
               _legend(
-                color: Colors.redAccent,
+                color: AppColor.red,
                 text: 'ចំណាយ',
               ),
             ],
@@ -322,13 +308,12 @@ class AnalysDateView extends GetView<AnalysDateController> {
             shape: BoxShape.circle,
           ),
         ),
-
         const SizedBox(width: 7),
-
         Text(
           text,
-          style:  AppText.bodyLarge.copyWith(
+          style: AppText.bodyLarge.copyWith(
             fontWeight: FontWeight.w500,
+            color: AppColor.textPrimary,
           ),
         ),
       ],
@@ -344,23 +329,19 @@ class AnalysDateView extends GetView<AnalysDateController> {
             title: 'ចំណូល',
             amount: controller.income.value,
             percent: controller.incomePercent,
-            iconColor: Colors.green,
-            iconBackground:
-                Colors.green.shade50,
+            iconColor: AppColor.primaryColor,
+            iconBackground: AppColor.primaryColor.withValues(alpha: 0.1),
           ),
         ),
-
         const SizedBox(width: 12),
-
         Expanded(
           child: _summaryCard(
             icon: Icons.arrow_upward,
             title: 'ចំណាយ',
             amount: controller.expense.value,
             percent: controller.expensePercent,
-            iconColor: Colors.redAccent,
-            iconBackground:
-                Colors.red.shade50,
+            iconColor: AppColor.red,
+            iconBackground: AppColor.red.withValues(alpha: 0.1),
           ),
         ),
       ],
@@ -378,12 +359,18 @@ class AnalysDateView extends GetView<AnalysDateController> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColor.white,
         borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: AppColor.shadow,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 42,
@@ -397,28 +384,23 @@ class AnalysDateView extends GetView<AnalysDateController> {
               color: iconColor,
             ),
           ),
-
           const SizedBox(height: 12),
-
           Text(
             title,
             style: AppText.bodyLarge.copyWith(
-              color: Colors.grey.shade600,
+              color: AppColor.textSecondary,
             ),
           ),
-
           const SizedBox(height: 6),
-
           Text(
             '\$${amount.toStringAsFixed(2)}',
-            style:  AppText.h4.copyWith(
+            style: AppText.h4.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: AppColor.textPrimary,
             ),
           ),
-
           const SizedBox(height: 5),
-
           Text(
             '${percent.toStringAsFixed(1)}%',
             style: AppText.h4.copyWith(
@@ -436,16 +418,12 @@ class AnalysDateView extends GetView<AnalysDateController> {
     switch (controller.selectedFilter.value) {
       case 'day':
         return 'ថ្ងៃ';
-
       case 'week':
         return 'សប្ដាហ៍';
-
       case 'month':
         return 'ខែ';
-
       case 'year':
         return 'ឆ្នាំ';
-
       default:
         return '';
     }

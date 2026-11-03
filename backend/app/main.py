@@ -1,4 +1,5 @@
 from pathlib import Path
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,10 +17,15 @@ from app.routers import (
     notifications,
     transactions,
     cash_transfers,
-    profile
+    profile,
+    savings,
 )
 from app.services.firebase_notification_service import (
     initialize_firebase,
+)
+from app.services.savings_scheduler import (
+    start_savings_scheduler,
+    shutdown_savings_scheduler,
 )
 
 BASE_DIR = (
@@ -39,11 +45,21 @@ UPLOAD_DIR.mkdir(
 )
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    initialize_firebase()
+    start_savings_scheduler()
+    yield
+    # Shutdown
+    shutdown_savings_scheduler()
+
+
 app = FastAPI(
     title="KhmerPay Mobile Banking API",
     version="1.0.0",
+    lifespan=lifespan,
 )
-initialize_firebase()
 
 app.add_middleware(
     CORSMiddleware,
@@ -110,6 +126,9 @@ app.include_router(
 )
 app.include_router(
     profile.router
+)
+app.include_router(
+    savings.router
 )
 # ==========================================
 # STATIC FILES

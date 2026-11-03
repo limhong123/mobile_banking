@@ -11,10 +11,7 @@ import {
   UserRoundCog,
   Wallet,
   X,
-  SlidersHorizontal,
 } from "lucide-react";
-
-import BalanceAdjustmentModal from "../../components/BalanceAdjustmentModal";
 
 import {
   createAgent,
@@ -75,11 +72,6 @@ export default function Agents() {
   const [
     selectedAgent,
     setSelectedAgent,
-  ] = useState(null);
-
-  const [
-    adjustAgent,
-    setAdjustAgent,
   ] = useState(null);
 
   const [
@@ -1070,32 +1062,6 @@ export default function Agents() {
                             <button
                               type="button"
                               onClick={() =>
-                                setAdjustAgent({
-                                  id: agent.id,
-                                  name: `${agent.first_name || ""} ${agent.last_name || ""}`.trim() || agent.agent_code || "Agent",
-                                  phone: agent.phone_number,
-                                  balance: agent.balance,
-                                  currency: agent.currency || "USD",
-                                  type: "agent",
-                                })
-                              }
-                              disabled={
-                                !agent.is_active
-                              }
-                              className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
-                              title="Manual Balance Debit or Credit"
-                            >
-                              <SlidersHorizontal
-                                size={15}
-                              />
-
-                              Debit / Credit
-                            </button>
-
-
-                            <button
-                              type="button"
-                              onClick={() =>
                                 handleResetPin(
                                   agent
                                 )
@@ -1396,7 +1362,6 @@ export default function Agents() {
                     placeholder="Phnom Penh Branch"
                     required
                   />
-
 
                   <div className="sm:col-span-2">
 
@@ -1789,13 +1754,6 @@ export default function Agents() {
             </div>
 
           )}
-
-        <BalanceAdjustmentModal
-          isOpen={Boolean(adjustAgent)}
-          onClose={() => setAdjustAgent(null)}
-          target={adjustAgent}
-          onSuccess={loadAgents}
-        />
 
       </>
   );

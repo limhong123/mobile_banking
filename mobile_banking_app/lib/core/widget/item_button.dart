@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_banking_app/app/app_color.dart';
 import 'package:mobile_banking_app/app/app_text.dart';
 
 class ItemButton extends StatelessWidget {
@@ -19,7 +20,7 @@ class ItemButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = color ?? Colors.green.shade600;
+    final themeColor = color ?? AppColor.primaryColor;
 
     return InkWell(
       onTap: isLoading ? null : onTap,
@@ -43,10 +44,10 @@ class ItemButton extends StatelessWidget {
                         height: 18,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white,
+                          color: AppColor.white,
                         ),
                       )
-                    : Icon(icon, color: Colors.white, size: 20),
+                    : Icon(icon, color: AppColor.white, size: 20),
               ),
             ),
             const SizedBox(height: 3),
